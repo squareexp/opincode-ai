@@ -6,7 +6,7 @@ This document helps you decide *whether* and *how* to contribute in a way that's
 
 ## How this project is run
 
-- OpinCode has one active maintainer ([@ajmalleonard](https://github.com/ajmalleonard)).
+- OpinCode has one active maintainers ([@squareexp](https://github.com/squareexp)).
 - Review bandwidth is limited.
 - Not every contribution can be accepted, even if it's technically correct. Alignment with project direction matters as much as code quality.
 - For scope and direction, see [ROADMAP.md](ROADMAP.md). Read it before opening anything non-trivial.
