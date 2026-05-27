@@ -1,0 +1,154 @@
+# Roadmap
+
+OpinCode direction, what's shipped, what's coming, and what's deliberately out of scope.
+
+This file is updated as direction evolves. For day-to-day work, see [GitHub Issues](https://github.com/ajmalleonard/opincode-ai/issues) and the Projects board.
+
+## What OpinCode is
+
+OpinCode is a fast, lightweight, AI-native terminal (ADE - agentic development environment). It pairs a native PTY backend with a modern UI: multi-tab terminals, an integrated code editor, a file explorer, source control, and a first-class AI agent system that works with your own API keys or fully local models. No telemetry. Keys stored in the OS keychain.
+
+The product is opinionated: terminal-first, AI as a primitive (not a sidebar), lightweight always, cross-platform without compromise.
+
+## What OpinCode is not
+
+- Not a full IDE replacement. Heavy IDE features that overlap with VS Code / Cursor / Zed are out of scope.
+- Not a browser. Web preview exists for local dev servers and lightweight doc viewing only.
+- Not a general workspace. Tools and formats that pull the product away from the terminal-first surface are out of scope.
+- Not a one-size-fits-all CLI replacement. The goal is "best AI-native terminal", not "shell with extras".
+
+## Themes
+
+The themes below frame every scope decision.
+
+1. **AI as a native primitive.** Agents, tools, autocomplete, voice - first-class, not a panel bolted onto a regular terminal.
+2. **Lightweight always.** 7-8 MB binary. Every dependency justified. Per-tab memory budget enforced.
+3. **Terminal-first.** xterm.js correctness, PTY fidelity, TUI app compatibility are non-negotiable.
+4. **Cross-platform parity.** macOS, Linux, Windows, WSL. No platform-specific exclusives.
+5. **Security by default.** Path guards, SSRF protection, OSC trust, IPC sandboxing. Defaults safe out of the box.
+
+## Shipped
+
+### Terminal
+
+- [X]  Multi-tab terminal with WebGL renderer
+- [X]  Native PTY backend (zsh, bash, pwsh, fish, cmd)
+- [X]  Split panes
+- [X]  Shell integration (cwd, prompt markers)
+- [X]  Inline search, link detection, true-color
+- [X]  Private terminal tabs with AI-context redaction
+- [X]  WSL bridge as workspace environment
+- [X]  Inline terminal auto-suggestions (history-based)
+- [X]  Persistent terminal sessions and layout restore
+
+### Editor
+
+- [X]  Multi-language support (TypeScript / JavaScript, Rust, Python, HTML / CSS, JSON, Markdown, Go, C / C++ / Java / C#, PHP)
+- [X]  Inline AI autocomplete
+- [X]  AI edit diffs
+- [X]  Vim mode
+- [X]  Prebuilt themes
+
+### File Explorer
+
+- [X]  Icon theme with full file-type coverage
+- [X]  Fuzzy search, keyboard navigation, inline rename, context actions
+
+### Git / Source Control
+
+- [X]  Source control panel (stage, commit, branch)
+- [X]  Git history with commit graph
+- [X]  Per-file diffs
+
+### AI
+
+- [X]  Multiple cloud and local providers (BYOK)
+- [X]  Multi-agent and sub-agents
+- [X]  Voice input
+- [X]  Slash commands and skills
+- [X]  Project memory and per-project configuration
+- [X]  Tools with approval flow (file read / write / edit, bash, search, plan)
+- [X]  Approval flow improvements (YOLO / auto-approve mode)
+- [X]  Workspace file picker
+- [X]  Auto-compact for long context
+
+### Web Preview
+
+- [X]  Auto-detected local dev server preview
+- [X]  Image and PDF viewers
+- [X]  Sandboxed iframe
+
+### Platform Integration
+
+- [X]  macOS, Linux (.deb / .rpm / AppImage), Windows (NSIS), WSL
+- [X]  AUR (Arch)
+- [X]  Windows Explorer context-menu integration
+- [X]  Auto-updater
+- [X]  OS keychain for API keys
+- [X]  No telemetry
+
+### Security
+
+- [X]  Hardened AI tool surface (file system, network, IPC)
+- [X]  SSRF and DNS defenses on outbound HTTP
+- [X]  Trust gating in terminal escape-sequence handling
+- [X]  Sandboxed preview surface
+
+## Planned
+
+### Coming next
+
+- [ ]  SSH support (PTY auth and known_hosts first; SFTP and port forwarding later)
+- [ ]  Themes and customizations (terminal themes, UI accents, keybindings, layout)
+- [ ]  AI autocomplete improvements in editor (project-aware context, lower latency)
+- [ ]  Drag and drop in terminal (files as quoted paths, AI panel as context)
+- [ ]  AI-driven smart diagnostics (detecting non-zero exit codes in the terminal with one-click auto-fix proposals)
+- [ ]  Interactive inline command widgets (rendering structured command outputs like JSON, CSV, and markdown tables as rich UI cards)
+- [ ]  Visual agent execution timeline (step-by-step trace showing file edits, commands run, and AI planning steps)
+- [ ]  AI agent meta-orchestration (OpinCode agent spawning and managing external coding agents like Claude Code / OpenCode)
+- [ ]  Multi-agent peer collaboration (pair programming interfaces with external terminal-based agents like Claude Code)
+- [ ]  More slash commands and skills
+- [ ]  Preview surface expansion (better image / Markdown handling)
+- [ ]  Test coverage expansion (PTY edge cases, security functions, AI tool guards)
+
+### Longer horizon
+
+- [ ]  Local semantic workspace indexing (lightweight vector-less context generation for fast and precise AI workspace grounding)
+- [ ]  Release automation (CHANGELOG, version bump, tag flow)
+- [ ]  Bundle optimization (lazy-load language packs, individual UI primitive imports, tree-shake)
+- [ ]  Selective TS → Rust migration where the profiler shows measurable wins
+- [ ]  AI tools / skills as installable bundles
+- [ ]  Live filesystem updates in explorer and editor
+
+## Wanted contributions
+
+Strategic areas where help is welcome. Pick something and propose an approach in Discord or via an issue first.
+
+- **Test coverage.** PTY edge cases across platforms, security functions, AI tool guards.
+- **Bundle optimization.** Profile and propose specific dependency replacements or tree-shake fixes.
+- **Platform-specific bugs.** Rendering issues on niche distros, shell quirks, WSL edge cases.
+- **Documentation and translations.** Improvements, screenshots, examples, non-English README sections.
+- **Themes.** Terminal and editor themes, UI accent palettes that fit the lightweight aesthetic.
+- **Provider integrations.** Only providers that add unique value beyond existing coverage. Justify the case before implementing.
+
+See `good-first-issue` and `help-wanted` labels on GitHub Issues for concrete tasks.
+
+## Out of scope
+
+Categories that will not be built into OpinCode. Individual feature requests in these categories will be closed.
+
+- **Heavy IDE features.** Full language-server integration, integrated debuggers, refactoring engines, project-wide search at IDE scale. Use a real editor for those.
+- **Notebook and document workspaces.** Anything that turns OpinCode into a document host rather than a terminal.
+- **Package manager and toolchain UIs.** Use `npm`, `pip`, `cargo` and friends in the terminal directly.
+- **Full web browser features.** Preview pane stays scoped to local dev servers and lightweight doc viewing. No navigation history, no bookmarks, no dev tools.
+- **Telemetry, analytics, accounts.** OpinCode stays BYOK and offline-respectful.
+- **Extension marketplaces at IDE scale.** Narrowly-scoped AI tool / skill bundles may happen eventually. Arbitrary UI or behavior extensions will not.
+- **Third-party subscription session bridges.** Forwarding cloud subscription auth (provider-managed login sessions) through OpinCode is not technically feasible for third-party clients.
+
+## Decision authority
+
+Direction and scope decisions are made by [@ajmalleonard](https://github.com/ajmalleonard). Trusted reviewers (informal, no fixed roles yet) provide input on security, performance, and platform-specific areas.
+
+If a PR is closed and you disagree, raise it in Discord. Happy to discuss, not happy to be ambushed in a PR comment thread.
+
+This will likely formalize over time as the project grows.
