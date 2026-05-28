@@ -91,16 +91,6 @@ export function useUpdater({ autoCheck = true }: HookOptions = {}) {
     }
     setStatus({ kind: "checking" });
     try {
-      if (IS_LINUX) {
-        const info = await checkLinuxRelease();
-        if (info) {
-          setStatus({ kind: "manual-available", info });
-        } else {
-          localStorage.setItem(LAST_CHECK_KEY, String(Date.now()));
-          setStatus({ kind: "uptodate" });
-        }
-        return;
-      }
       const update = await check();
       if (update) {
         setStatus({ kind: "available", update });
@@ -109,6 +99,17 @@ export function useUpdater({ autoCheck = true }: HookOptions = {}) {
         setStatus({ kind: "uptodate" });
       }
     } catch (err) {
+      if (IS_LINUX) {
+        try {
+          const info = await checkLinuxRelease();
+          if (info) {
+            setStatus({ kind: "manual-available", info });
+            return;
+          }
+        } catch {
+          // fall through to the primary error
+        }
+      }
       setStatus({ kind: "error", message: String(err) });
     }
   }, []);
