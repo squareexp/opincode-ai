@@ -46,15 +46,16 @@ export function SidebarRail({ activeView, onSelectView, changedCount }: Props) {
             aria-pressed={isActive}
             onClick={() => onSelectView(item.id)}
             className={cn(
-              "group relative flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md text-[11px] font-medium outline-none transition-colors duration-150",
+              "group relative flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-full text-[11px] font-medium outline-none transition-colors duration-150",
               "focus-visible:ring-2 focus-visible:ring-primary/40",
               isActive
-                ? "bg-foreground/[0.07] text-foreground dark:bg-foreground/[0.09]"
-                : "text-muted-foreground hover:bg-foreground/[0.045] hover:text-foreground",
+                ? "bg-foreground/[0.07] text-foreground dark:bg-foreground/9"
+                : "text-muted-foreground hover:bg-foreground/4.5 hover:text-foreground",
             )}
           >
             <item.icon variant="Linear"
               size={14}
+              color="currentColor"
               className="shrink-0 transition-[stroke-width] duration-150"
             />
             <span>{item.label}</span>

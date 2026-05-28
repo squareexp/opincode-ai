@@ -60,7 +60,7 @@ function describe(meta: AgentMeta): {
   return {
     tone:
       "border-border/60 bg-card text-muted-foreground hover:text-foreground",
-    icon: <Spinner className="size-3" />,
+    icon: <Spinner />,
     label: meta.step ?? "Thinking…",
   };
 }

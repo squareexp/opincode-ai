@@ -24,6 +24,8 @@ import {
   AiInputBar,
   AiInputBarConnect,
   AiMiniWindow,
+  AgentStatusFloating,
+  AgentErrorFloating,
   getAllKeys,
   hasAnyKey,
   LocalAgentNotificationsBridge,
@@ -395,6 +397,9 @@ export default function App() {
   const setSelectedModelId = useChatStore((s) => s.setSelectedModelId);
   const setLive = useChatStore((s) => s.setLive);
   const respondToApproval = useChatStore((s) => s.respondToApproval);
+  const agentStatus = useChatStore((s) => s.agentMeta.status);
+  const isWorking = agentStatus === "thinking" || agentStatus === "streaming";
+  const agentError = useChatStore((s) => s.agentMeta.error);
 
   useEffect(() => {
     if (activeSessionId) firePendingReviewForSession(activeSessionId);
@@ -1518,6 +1523,8 @@ export default function App() {
 
           <AnimatePresence>
             {miniOpen && hasComposer ? <AiMiniWindow key="ai-mini" /> : null}
+            {hasComposer && isWorking ? <AgentStatusFloating key="agent-status" /> : null}
+            {hasComposer && agentError ? <AgentErrorFloating key="agent-error" /> : null}
             {askPopup ? (
               <SelectionAskAi
                 key="ask-ai-popup"

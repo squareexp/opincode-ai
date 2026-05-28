@@ -234,7 +234,7 @@ export function AiInputBar() {
 
         <Popover open={pickerOpen}>
           <PopoverAnchor asChild>
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-2 rounded-full border border-border/60  px-3 py-2 focus-within:border-border">
               <textarea
                 ref={c.textareaRef}
                 value={c.value}

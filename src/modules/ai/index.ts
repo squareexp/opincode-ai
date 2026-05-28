@@ -26,3 +26,6 @@ export {
   type AgentMeta,
   type AgentRunStatus,
 } from "./store/chatStore";
+export { AgentStatusFloating } from "./components/AgentStatusFloating";
+export { AgentErrorFloating } from "./components/AgentErrorFloating";
+

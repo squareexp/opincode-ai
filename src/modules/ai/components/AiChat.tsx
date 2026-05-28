@@ -28,7 +28,6 @@ import {
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { SLASH_COMMANDS, OPINCODE_CMD_RE } from "../lib/slashCommands";
-import { Spinner } from "@/components/ui/spinner";
 import { useChatStore, sendMessage } from "../store/chatStore";
 import type {
   ChatStatus,
@@ -181,13 +180,12 @@ export function AiChatView({
   addToolApprovalResponse,
 }: Props) {
   const isBusy = status === "submitted" || status === "streaming";
+  void clearError;
   const lastMessage = messages[messages.length - 1];
-  const showSpinner = isBusy && lastMessage?.role === "user";
   const streamingMessageId =
     status === "streaming" && lastMessage?.role === "assistant"
       ? lastMessage.id
       : null;
-  const step = useChatStore((s) => s.agentMeta.step);
   const hitStepCap = useChatStore((s) => s.agentMeta.hitStepCap);
   const compactionNotice = useChatStore((s) => s.agentMeta.compactionNotice);
   const patchAgentMeta = useChatStore((s) => s.patchAgentMeta);
@@ -229,12 +227,6 @@ export function AiChatView({
             onDismiss={() => patchAgentMeta({ compactionNotice: null })}
           />
         )}
-        {showSpinner && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Spinner />
-            <span className="truncate">{step ?? "Thinking…"}</span>
-          </div>
-        )}
         {showContinue && (
           <ContinueRow
             onContinue={() => {
@@ -246,18 +238,9 @@ export function AiChatView({
           />
         )}
         {error && (
-          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
-            <div className="font-medium">Something went wrong.</div>
-            <div className="mt-0.5 leading-relaxed opacity-90">
-              {error.message}
-            </div>
-            <button
-              type="button"
-              onClick={clearError}
-              className="mt-1 underline opacity-80 hover:opacity-100"
-            >
-              Dismiss
-            </button>
+          <div className="flex items-center gap-1.5 px-2 py-1.5 text-[11px] font-semibold text-destructive/90 select-none animate-pulse">
+            <span className="size-1.5 rounded-full bg-destructive shrink-0" />
+            <span>Interrupted with error</span>
           </div>
         )}
       </ConversationContent>

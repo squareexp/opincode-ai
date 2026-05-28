@@ -38,7 +38,8 @@ The themes below frame every scope decision.
 - [X]  Inline search, link detection, true-color
 - [X]  Private terminal tabs with AI-context redaction
 - [X]  WSL bridge as workspace environment
-- [X]  Inline terminal auto-suggestions (history-based)
+- [X]  Inline terminal auto-suggestions (history-based, in-memory)
+- [X]  Persistent terminal command history (cross-session, saved to disk — press → or End to accept)
 - [X]  Persistent terminal sessions and layout restore
 
 ### Editor
@@ -102,7 +103,9 @@ The themes below frame every scope decision.
 - [ ]  Themes and customizations (terminal themes, UI accents, keybindings, layout)
 - [ ]  AI autocomplete improvements in editor (project-aware context, lower latency)
 - [ ]  Drag and drop in terminal (files as quoted paths, AI panel as context)
-- [ ]  AI-driven smart diagnostics (detecting non-zero exit codes in the terminal with one-click auto-fix proposals)
+- [x]  AI-driven smart diagnostics (detecting non-zero exit codes in the terminal with one-click auto-fix proposals)
+- [x]  Persistent terminal command history (cross-session suggestion memory — right-arrow to accept)
+- [ ]  AI command intelligence (context-aware inline command suggestions powered by AI, opt-in, non-blocking)
 - [ ]  Interactive inline command widgets (rendering structured command outputs like JSON, CSV, and markdown tables as rich UI cards)
 - [ ]  Visual agent execution timeline (step-by-step trace showing file edits, commands run, and AI planning steps)
 - [ ]  AI agent meta-orchestration (OpinCode agent spawning and managing external coding agents like Claude Code / OpenCode)

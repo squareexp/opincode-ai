@@ -625,14 +625,14 @@ function YoloToggle() {
       }
       onClick={() => void setYoloMode(!yoloMode)}
       className={cn(
-        "relative flex h-6 items-center gap-1 rounded-md border px-1.5 text-[10.5px] font-medium transition-all",
+        "relative flex h-6 items-center gap-1 rounded-full border px-1.5 text-[10.5px] font-medium transition-all",
         yoloMode
-          ? "border-amber-500/60 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
+          ? "border-green-500/60 bg-green-500/10 text-green-500 hover:bg-green-500/20"
           : "border-border/60 bg-transparent text-muted-foreground hover:border-border hover:bg-accent hover:text-foreground",
       )}
     >
       {yoloMode && (
-        <span className="absolute inset-0 rounded-md ring-1 ring-amber-500/40 animate-pulse pointer-events-none" />
+        <span className="absolute inset-0 rounded-full ring-1 ring-green-500/40 animate-pulse pointer-events-none" />
       )}
       <HugeiconsIcon icon={FlashIcon} strokeWidth={1.75} size={11} />
       YOLO

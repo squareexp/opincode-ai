@@ -1,6 +1,7 @@
-import { Refresh2, Notification, Notification1, TickCircle } from 'iconsax-react';
+import { Notification, Notification1, TickCircle } from 'iconsax-react';
 
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 
 import {
   Popover,
@@ -268,12 +269,7 @@ export function NotificationBell({ onActivate, onActivateLocal }: Props) {
               className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-[12px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-60"
             >
               {installing ? (
-                <Refresh2
-                  variant="Linear"
-                  size={14}
-                  color="currentColor"
-                  className="animate-spin shrink-0"
-                />
+                <Spinner className="mr-1.5" />
               ) : (
                 <Notification1
                   variant="Linear"

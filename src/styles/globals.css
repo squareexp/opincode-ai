@@ -347,3 +347,69 @@ html *::-webkit-scrollbar {
 .opincode-collapsible-content[data-state="closed"] {
   animation: opincode-collapsible-up 160ms cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+
+/* HTML: <div class="loader1"></div> */
+.loader1 {
+  width: 5px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  animation: l5 1s infinite linear alternate;
+}
+@keyframes l5 {
+    0%  {box-shadow: 9px 0 currentColor, -9px 0 rgba(140,140,140,0.18); background: currentColor }
+    33% {box-shadow: 9px 0 currentColor, -9px 0 rgba(140,140,140,0.18); background: rgba(140,140,140,0.18)}
+    66% {box-shadow: 9px 0 rgba(140,140,140,0.18), -9px 0 currentColor; background: rgba(140,140,140,0.18)}
+    100%{box-shadow: 9px 0 rgba(140,140,140,0.18), -9px 0 currentColor; background: currentColor }
+}
+
+
+/* HTML: <div class="loader2"></div> */
+.loader2 {
+  width: 14px;
+  aspect-ratio: 1;
+  --_g: no-repeat radial-gradient(farthest-side,currentColor 90%,#0000);
+  background: var(--_g), var(--_g), var(--_g), var(--_g);
+  background-size: 40% 40%;
+  animation: l46 1s infinite;
+}
+@keyframes l46 {
+  0%  {background-position: 0 0      ,100% 0,100% 100%,0 100%}
+  40%,
+  50% {background-position: 100% 100%,100% 0,0    0   ,0 100%}
+  90%,
+  100%{background-position: 100% 100%,0 100%,0    0   ,100% 0}
+}
+
+/* HTML: <div class="loader3"></div> */
+.loader3 {
+  width: 14px;
+  aspect-ratio: 1;
+  --_g: no-repeat radial-gradient(farthest-side,currentColor 94%,#0000);
+  background:
+    var(--_g) 0    0,
+    var(--_g) 100% 0,
+    var(--_g) 100% 100%,
+    var(--_g) 0    100%;
+  background-size: 40% 40%;
+  animation: l38 .5s infinite; 
+}
+@keyframes l38 {
+  100% {background-position: 100% 0,100% 100%,0 100%,0 0}
+}
+
+/* HTML: <div class="loader4"></div> */
+.loader4 {
+  color: currentColor;
+  width: 3px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 7px 0 0 2px, 14px 0 0 1px, 21px 0 0 0;
+  transform: translateX(-14px);
+  animation: l21 .5s infinite alternate linear;
+}
+
+@keyframes l21 {
+  50%  {box-shadow: 7px 0 0 1px, 14px 0 0 2.5px, 21px 0 0 1px}
+  100% {box-shadow: 7px 0 0 0  , 14px 0 0 1px, 21px 0 0 2.5px}
+}

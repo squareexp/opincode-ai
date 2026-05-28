@@ -43,6 +43,8 @@ export function registerPromptTracker(
   term: Terminal,
   state?: ShellIntegrationState,
   onHistoryEntry?: (cmd: string) => void,
+  onCommandFinished?: (cmd: string, exitCode: number) => void,
+  onCommandStarted?: () => void,
 ): PromptTracker {
   let marker: IMarker | null = null;
   // Buffer command text between OSC 133 B (command start) and D (command end).
@@ -57,6 +59,7 @@ export function registerPromptTracker(
       // OSC 133 B — command begins.
       if (state) state.inCommand = true;
       cmdBuffer = "";
+      if (onCommandStarted) onCommandStarted();
     } else if (data.startsWith("C")) {
       // OSC 133 C — command pre-execution marker.
       if (state) state.inCommand = true;
@@ -67,8 +70,18 @@ export function registerPromptTracker(
     } else if (data.startsWith("D")) {
       // OSC 133 D — command ends. Emit history entry if we have a command.
       if (state) state.inCommand = false;
-      if (cmdBuffer.trim() && onHistoryEntry) {
-        onHistoryEntry(cmdBuffer.trim());
+      
+      const parts = data.split(";");
+      const statusStr = parts[1];
+      const exitCode = statusStr ? parseInt(statusStr, 10) : 0;
+
+      if (cmdBuffer.trim()) {
+        if (onHistoryEntry) {
+          onHistoryEntry(cmdBuffer.trim());
+        }
+        if (onCommandFinished) {
+          onCommandFinished(cmdBuffer.trim(), exitCode);
+        }
       }
       cmdBuffer = "";
     }

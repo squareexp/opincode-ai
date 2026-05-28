@@ -1,15 +1,20 @@
-import { Refresh2 } from 'iconsax-react';
 import { cn } from "@/lib/utils";
 
+export interface SpinnerProps extends React.ComponentProps<"div"> {
+  variant?: 1 | 2 | 3 | 4;
+}
 
-function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
+function Spinner({ className, variant = 1, ...props }: SpinnerProps) {
+  const loaderClass = `loader${variant}`;
   return (
-    <Refresh2 variant="Linear"
-            role="status"
+    <div
+      role="status"
       aria-label="Loading"
-      className={cn("size-4 animate-spin", className)}
+      className={cn("inline-flex items-center justify-center shrink-0 mr-3 ml-1.5", className)}
       {...props}
-     color="currentColor"/>
+    >
+      <div className={loaderClass} />
+    </div>
   );
 }
 

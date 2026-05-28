@@ -4,6 +4,7 @@ import type { SearchAddon } from "@xterm/addon-search";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { DormantRing } from "./dormantRing";
 import { HistorySuggestAddon } from "./historyAddon";
+import { loadHistory, flushHistory } from "./historyPersist";
 import {
   createShellIntegrationState,
   registerCwdHandler,
@@ -176,6 +177,11 @@ function ensureSession(leafId: number, initialCwd?: string): Session {
   session.ready = (async () => {
     await ensureMonoFontsLoaded();
     await document.fonts.ready;
+    // Seed the history suggestion ring from disk once fonts are ready.
+    const persisted = await loadHistory();
+    if (persisted.length > 0 && !session.disposed) {
+      session.historySuggest.seedHistory(persisted);
+    }
   })();
 
   return session;
@@ -237,6 +243,19 @@ function bindLeafToSlot(leafId: number, s: Session): void {
         term,
         shellState,
         (cmd) => historySuggest.addHistoryEntry(cmd),
+        (cmd, exitCode) => {
+          const event = new CustomEvent("opincode:command-finished", {
+            detail: { command: cmd, exitCode },
+            bubbles: true,
+          });
+          term.element?.dispatchEvent(event);
+        },
+        () => {
+          const event = new CustomEvent("opincode:command-started", {
+            bubbles: true,
+          });
+          term.element?.dispatchEvent(event);
+        },
       );
       const cwd = registerCwdHandler(
         term,
@@ -387,6 +406,8 @@ export function disposeSession(leafId: number): void {
       w.resolve();
     }
   }
+  // Eagerly flush any pending history write.
+  flushHistory();
 }
 
 type Options = {

@@ -16,7 +16,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import { useChat, type UIMessage } from "@ai-sdk/react";
 import { motion } from "motion/react";
@@ -58,11 +57,6 @@ const SUGGESTIONS = [
 export function AiMiniWindow() {
   const closeMini = useChatStore((s) => s.closeMini);
   const sessionId = useChatStore((s) => s.activeSessionId);
-  const openPanel = useChatStore((s) => s.openPanel);
-  const expandToPanel = () => {
-    closeMini();
-    openPanel();
-  };
 
   const { ref, onHeaderPointerDown, startResize } = useMiniWindowGeometry();
 
@@ -105,13 +99,11 @@ export function AiMiniWindow() {
         <Body
           sessionId={sessionId}
           onClose={closeMini}
-          onExpand={expandToPanel}
           onHeaderPointerDown={onHeaderPointerDown}
         />
       ) : (
         <EmptyShell
           onClose={closeMini}
-          onExpand={expandToPanel}
           onHeaderPointerDown={onHeaderPointerDown}
         />
       )}
@@ -152,29 +144,40 @@ function ResizeHandle({
 function Body({
   sessionId,
   onClose,
-  onExpand,
   onHeaderPointerDown,
 }: {
   sessionId: string;
   onClose: () => void;
-  onExpand: () => void;
   onHeaderPointerDown: (e: React.PointerEvent) => void;
 }) {
   const focusInput = useChatStore((s) => s.focusInput);
-  const step = useChatStore((s) => s.agentMeta.step);
+  const patchAgentMeta = useChatStore((s) => s.patchAgentMeta);
+  const globalError = useChatStore((s) => s.agentMeta.error);
 
   const chat = useMemo(() => getOrCreateChat(sessionId), [sessionId]);
   const helpers = useChat<UIMessage>({ chat });
-  const isBusy =
-    helpers.status === "submitted" || helpers.status === "streaming";
+
+  // Sync local chat error to global store
+  useEffect(() => {
+    if (helpers.error) {
+      patchAgentMeta({
+        status: "error",
+        error: helpers.error.message || String(helpers.error),
+      });
+    }
+  }, [helpers.error, patchAgentMeta]);
+
+  // Sync global error dismissal to local chat state
+  useEffect(() => {
+    if (!globalError && helpers.error) {
+      helpers.clearError();
+    }
+  }, [globalError, helpers.error]);
 
   return (
     <>
       <Header
-        step={step}
-        isBusy={isBusy}
         onClose={onClose}
-        onExpand={onExpand}
         messages={helpers.messages}
         onHeaderPointerDown={onHeaderPointerDown}
       />
@@ -229,20 +232,15 @@ function PlanModeStrip() {
 
 function EmptyShell({
   onClose,
-  onExpand,
   onHeaderPointerDown,
 }: {
   onClose: () => void;
-  onExpand: () => void;
   onHeaderPointerDown: (e: React.PointerEvent) => void;
 }) {
   return (
     <>
       <Header
-        step={null}
-        isBusy={false}
         onClose={onClose}
-        onExpand={onExpand}
         onHeaderPointerDown={onHeaderPointerDown}
       />
       <div className="flex flex-1 items-center justify-center text-[11px] text-muted-foreground">
@@ -253,16 +251,11 @@ function EmptyShell({
 }
 
 function Header({
-  step,
-  isBusy,
   onClose,
   messages,
   onHeaderPointerDown,
 }: {
-  step: string | null;
-  isBusy: boolean;
   onClose: () => void;
-  onExpand: () => void;
   messages?: UIMessage[];
   onHeaderPointerDown: (e: React.PointerEvent) => void;
 }) {
@@ -281,12 +274,6 @@ function Header({
         ) : null}
       </div>
       <div className="flex shrink-0 items-center gap-1">
-        {isBusy ? (
-          <span className="flex min-w-0 items-center gap-1 text-[10px] text-muted-foreground">
-            <Spinner className="size-2.5" />
-            <span className="max-w-32 truncate">{step ?? "Thinking…"}</span>
-          </span>
-        ) : null}
         <SessionPicker />
         <Button
           type="button"
