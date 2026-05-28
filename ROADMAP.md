@@ -2,7 +2,7 @@
 
 OpinCode direction, what's shipped, what's coming, and what's deliberately out of scope.
 
-This file is updated as direction evolves. For day-to-day work, see [GitHub Issues](https://github.com/ajmalleonard/opincode-ai/issues) and the Projects board.
+This file is updated as direction evolves. For day-to-day work, see [GitHub Issues](https://github.com/squareexp/opincode-ai/issues) and the Projects board.
 
 ## What OpinCode is
 

@@ -10,7 +10,7 @@ import { arch, platform } from "@tauri-apps/plugin-os";
 import { useEffect, useState } from "react";
 import { SectionHeader } from "../components/SectionHeader";
 
-const REPO_URL = "https://github.com/ajmalleonard/opincode-ai";
+const REPO_URL = "https://github.com/squareexp/opincode-ai";
 const WEBSITE = "https://opincode.squareexp.com";
 
 const PLATFORM_LABEL: Record<string, string> = {
@@ -92,7 +92,7 @@ export function AboutSection() {
         </dd>
 
         <dt className="text-muted-foreground">Bundle ID</dt>
-        <dd className="font-mono text-[11.5px]">app.ajmalleonard.opincode</dd>
+        <dd className="font-mono text-[11.5px]">app.opincode.squareexp</dd>
 
         <dt className="text-muted-foreground">License</dt>
         <dd>Apache 2.0</dd>
@@ -105,7 +105,7 @@ export function AboutSection() {
             className="inline-flex items-center gap-1.5 rounded-md text-[12px] underline-offset-2 hover:text-foreground hover:underline"
           >
             <HugeiconsIcon icon={GithubIcon} size={12} strokeWidth={1.75} />
-            ajmalleonard/opincode-ai
+            squareexp/opincode-ai
           </button>
         </dd>
         <dt className="text-muted-foreground">Website</dt>
@@ -116,7 +116,7 @@ export function AboutSection() {
             className="inline-flex items-center gap-1.5 rounded-md text-[12px] underline-offset-2 hover:text-foreground hover:underline"
           >
             <Global variant="Linear" size={12}  color="currentColor"/>
-            opincode.app
+            squareexp.com
           </button>
         </dd>
       </dl>

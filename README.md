@@ -85,7 +85,7 @@ OpinCode is a lightweight open-source terminal (ADE) built on Tauri 2 + Rust and
 
 ## Install
 
-Latest installers are on the [Releases](https://github.com/ajmalleonard/opincode-ai/releases/latest) page. OpinCode auto-updates from there.
+Latest installers are on the [Releases](https://github.com/squareexp/opincode-ai/releases/latest) page. OpinCode auto-updates from there.
 
 ### Windows notes
 
