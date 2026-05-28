@@ -510,7 +510,13 @@ const FREEFORM_PROVIDERS: ReadonlySet<ProviderId> = new Set([
 // Reasoning models reject tool-call turns whose reasoning was stripped; keep it.
 export function modelKeepsReasoning(id: ModelId): boolean {
   const m = getModel(id);
-  return (m.tags?.includes("reasoning") ?? false) || FREEFORM_PROVIDERS.has(m.provider);
+  return (
+    (m.tags?.includes("reasoning") ?? false) ||
+    m.provider === "google" ||
+    m.provider === "deepseek" ||
+    m.provider === "openai" ||
+    FREEFORM_PROVIDERS.has(m.provider)
+  );
 }
 
 export const DEFAULT_MODEL_ID: ModelId = "gpt-5.4-mini";
