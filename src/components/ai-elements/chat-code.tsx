@@ -1,4 +1,4 @@
-import { ArrowRight2, TickCircle, Copy, Code, Code1 } from 'iconsax-react';
+import { ArrowRight2, TickCircle, Copy, Code1 } from 'iconsax-react';
 
 "use client";
 

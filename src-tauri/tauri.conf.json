@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "OpinCode",
-  "version": "0.7.3",
-  "identifier": "app.opincode.squareexp",
+  "version": "0.0.1",
+  "identifier": "app.opincode.terminal",
   "build": {
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",

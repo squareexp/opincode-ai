@@ -1,4 +1,4 @@
-import { CloseCircle, Global, Ghost, Add, Code, Edit2, FolderConnection, ArrowSwapVertical, Clock, Code1 } from 'iconsax-react';
+import { CloseCircle, Global, Ghost, Add, Edit2, FolderConnection, ArrowSwapVertical, Clock, Code1 } from 'iconsax-react';
 import { Button } from "@/components/ui/button";
 
 import {
