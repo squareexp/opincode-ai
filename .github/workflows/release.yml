@@ -17,15 +17,19 @@ jobs:
           - platform: macos-latest
             args: --target aarch64-apple-darwin
             rust-target: aarch64-apple-darwin
+            asset_label: Apple_Silicon
           - platform: macos-latest
             args: --target x86_64-apple-darwin
             rust-target: x86_64-apple-darwin
+            asset_label: Intel
           - platform: ubuntu-22.04
             args: ""
             rust-target: ""
+            asset_label: Linux
           - platform: windows-latest
             args: ""
             rust-target: ""
+            asset_label: Windows
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -71,4 +75,5 @@ jobs:
           releaseBody: "See the assets to download and install. Auto-update is built in."
           releaseDraft: false
           prerelease: false
+          releaseAssetNamePattern: "OpinCode_${{ matrix.asset_label }}_[version][ext]"
           args: ${{ matrix.args }}
