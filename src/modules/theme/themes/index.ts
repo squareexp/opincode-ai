@@ -2,21 +2,31 @@ import { DEFAULT_THEME_ID, type Theme } from "../types";
 import { caffeine } from "./caffeine";
 import { catppuccin } from "./catppuccin";
 import { claude } from "./claude";
+import { dracula } from "./dracula";
+import { everforest } from "./everforest";
+import { github } from "./github";
 import { gruvbox } from "./gruvbox";
 import { nord } from "./nord";
 import { opincodeDefault } from "./opincode-default";
 import { rosePine } from "./rose-pine";
 import { sage } from "./sage";
+import { synthwave84 } from "./synthwave84";
 import { tide } from "./tide";
 import { tokyoNight } from "./tokyo-night";
+import { vesper } from "./vesper";
 
 const BUILTIN: Theme[] = [
   opincodeDefault,
   claude,
+  github,
   tokyoNight,
+  dracula,
   nord,
   tide,
+  vesper,
+  synthwave84,
   sage,
+  everforest,
   catppuccin,
   gruvbox,
   rosePine,

@@ -1,0 +1,52 @@
+import type { Theme } from "../types";
+
+export const synthwave84: Theme = {
+  id: "synthwave84",
+  name: "Synthwave '84",
+  description: "Retro-future cyberpunk neon palette.",
+  editorTheme: { dark: "aura" },
+  variants: {
+    dark: {
+      colors: {
+        background: "#2b213a",
+        foreground: "#f0efe7",
+        card: "#241b2f",
+        cardForeground: "#f0efe7",
+        popover: "#201729",
+        popoverForeground: "#f0efe7",
+        primary: "#f92aad",
+        primaryForeground: "#2b213a",
+        secondary: "#372948",
+        secondaryForeground: "#f0efe7",
+        muted: "#372948",
+        mutedForeground: "#846e96",
+        accent: "#2cffff",
+        accentForeground: "#2b213a",
+        destructive: "#fe4450",
+        border: "rgba(240, 239, 231, 0.08)",
+        input: "rgba(240, 239, 231, 0.12)",
+        ring: "#f92aad",
+        sidebar: "#241b2f",
+        sidebarForeground: "#f0efe7",
+        sidebarPrimary: "#f92aad",
+        sidebarPrimaryForeground: "#2b213a",
+        sidebarAccent: "#372948",
+        sidebarAccentForeground: "#f0efe7",
+        sidebarBorder: "rgba(240, 239, 231, 0.08)",
+        sidebarRing: "#f92aad",
+        radius: "0.5rem",
+      },
+      terminal: {
+        cursor: "#2cffff",
+        cursorAccent: "#2b213a",
+        selection: "rgba(249, 42, 173, 0.25)",
+        ansi: [
+          "#201729", "#fe4450", "#72f1b8", "#fede5d",
+          "#03edf6", "#f92aad", "#fdfdfd", "#b9b5c4",
+          "#473859", "#ff6b77", "#98ffd2", "#fff275",
+          "#5effff", "#ff6bbd", "#ffffff", "#f0efe7",
+        ],
+      },
+    },
+  },
+};

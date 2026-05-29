@@ -1,0 +1,52 @@
+import type { Theme } from "../types";
+
+export const vesper: Theme = {
+  id: "vesper",
+  name: "Vesper",
+  description: "Minimalist dark gray and clean orange.",
+  editorTheme: { dark: "copilot" },
+  variants: {
+    dark: {
+      colors: {
+        background: "#101010",
+        foreground: "#ffffff",
+        card: "#161616",
+        cardForeground: "#ffffff",
+        popover: "#141414",
+        popoverForeground: "#ffffff",
+        primary: "#ff7c3b",
+        primaryForeground: "#101010",
+        secondary: "#242424",
+        secondaryForeground: "#ffffff",
+        muted: "#1c1c1c",
+        mutedForeground: "#7e7e7e",
+        accent: "#282828",
+        accentForeground: "#ffffff",
+        destructive: "#ff5c5c",
+        border: "rgba(255, 255, 255, 0.06)",
+        input: "rgba(255, 255, 255, 0.1)",
+        ring: "#ff7c3b",
+        sidebar: "#0c0c0c",
+        sidebarForeground: "#ffffff",
+        sidebarPrimary: "#ff7c3b",
+        sidebarPrimaryForeground: "#101010",
+        sidebarAccent: "#242424",
+        sidebarAccentForeground: "#ffffff",
+        sidebarBorder: "rgba(255, 255, 255, 0.06)",
+        sidebarRing: "#ff7c3b",
+        radius: "0.5rem",
+      },
+      terminal: {
+        cursor: "#ff7c3b",
+        cursorAccent: "#101010",
+        selection: "rgba(255, 124, 59, 0.2)",
+        ansi: [
+          "#1c1c1c", "#ff5c5c", "#86e088", "#ffd75f",
+          "#5fbfff", "#df8aff", "#5fffff", "#eeeeee",
+          "#4e4e4e", "#ff7c7c", "#a0f0a2", "#ffe88f",
+          "#8fdbff", "#e9a6ff", "#8fffff", "#ffffff",
+        ],
+      },
+    },
+  },
+};
