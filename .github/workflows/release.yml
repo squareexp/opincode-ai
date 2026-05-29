@@ -79,12 +79,36 @@ jobs:
             echo 'body=See the assets to download and install. Auto-update is built in.' >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Prepare Apple notarization key
+        if: matrix.platform == 'macos-latest'
+        shell: bash
+        env:
+          APPLE_API_KEY_SOURCE: ${{ secrets.APPLE_API_KEY_PATH }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY }}
+        run: |
+          if [ -z "$APPLE_API_KEY_SOURCE" ]; then
+            echo "APPLE_API_KEY_PATH secret is empty" >&2
+            exit 1
+          fi
+
+          mkdir -p "$RUNNER_TEMP/private_keys"
+          key_path="$RUNNER_TEMP/private_keys/AuthKey_${APPLE_API_KEY_ID}.p8"
+          printf '%s' "$APPLE_API_KEY_SOURCE" > "$key_path"
+          chmod 600 "$key_path"
+          echo "APPLE_API_KEY_PATH=$key_path" >> "$GITHUB_ENV"
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_GH_TOKEN }}
 
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "OpinCode ${{ github.ref_name }}"
