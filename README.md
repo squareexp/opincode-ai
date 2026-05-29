@@ -5,7 +5,7 @@
   <p><strong>Lightweight Terminal-first AI-native dev workspace.</strong></p>
 
   <p>
-    <img src="https://img.shields.io/badge/version-0.0.1-blue" alt="version" />
+    <img src="https://img.shields.io/github/package-json/v/squareexp/opincode-ai?label=version&color=blue" alt="version" />
     <img src="https://img.shields.io/badge/license-Apache--2.0-green" alt="license" />
     <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="platform" />
   </p>
@@ -86,6 +86,8 @@ OpinCode is a lightweight open-source terminal (ADE) built on Tauri 2 + Rust and
 ## Install
 
 Latest installers are on the [Releases](https://github.com/squareexp/opincode-ai/releases/latest) page. OpinCode auto-updates from there.
+
+Version bumps on `main` automatically create the matching `vX.Y.Z` tag and publish a release.
 
 ### Windows notes
 
