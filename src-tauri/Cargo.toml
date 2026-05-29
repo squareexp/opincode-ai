@@ -1,6 +1,6 @@
 [package]
 name = "opincode"
-version = "0.0.1"
+version = "0.0.2"
 description = "OpinCode — an open-source AI-native terminal emulator"
 authors = ["ajmalleonard"]
 license = "Apache-2.0"

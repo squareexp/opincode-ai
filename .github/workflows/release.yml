@@ -63,6 +63,22 @@ jobs:
       - name: Install frontend dependencies
         run: bun install --frozen-lockfile
 
+      - name: Load release notes
+        id: release_notes
+        shell: bash
+        run: |
+          notes_file=".github/release-notes/${{ github.ref_name }}.md"
+
+          if [ -f "$notes_file" ]; then
+            {
+              echo 'body<<EOF'
+              cat "$notes_file"
+              echo 'EOF'
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo 'body=See the assets to download and install. Auto-update is built in.' >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +88,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "OpinCode ${{ github.ref_name }}"
-          releaseBody: "See the assets to download and install. Auto-update is built in."
+          releaseBody: ${{ steps.release_notes.outputs.body }}
           releaseDraft: false
           prerelease: false
           releaseAssetNamePattern: "OpinCode_${{ matrix.asset_label }}_[version][ext]"
