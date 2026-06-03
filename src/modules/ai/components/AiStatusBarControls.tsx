@@ -2,7 +2,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowDown2, SearchNormal1, Setting2 } from 'iconsax-react';
 import { Button } from "@/components/ui/button";
 
-import { Add01Icon, AiBookIcon, AppleIcon, ArrowUpIcon, BrainIcon, ChatGptIcon, ClaudeIcon, Clock01Icon, CoinsDollarIcon, ComputerIcon, CpuIcon, DeepseekIcon, FavouriteIcon, FlashIcon, GlobeIcon, GoogleGeminiIcon, Grok02Icon, MistralIcon, Message01Icon, Mic01Icon, PlugIcon, ServerStack01Icon, StarIcon, StopCircleIcon, Tick01Icon } from '@hugeicons/core-free-icons';
+import { Add01Icon, AiBookIcon, ArrowUpIcon, BrainIcon, Clock01Icon, CoinsDollarIcon, FavouriteIcon, FlashIcon, Message01Icon, Mic01Icon, StarIcon, StopCircleIcon, Tick01Icon } from '@hugeicons/core-free-icons';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,22 +31,7 @@ import { toggleFavoriteModel } from "../lib/modelPrefs";
 import { useChatStore } from "../store/chatStore";
 import { usePreferencesStore } from "@/modules/settings/preferences";
 import { setYoloMode } from "@/modules/settings/store";
-
-const PROVIDER_ICON = {
-  openai: ChatGptIcon,
-  anthropic: ClaudeIcon,
-  google: GoogleGeminiIcon,
-  xai: Grok02Icon,
-  cerebras: CpuIcon,
-  groq: FlashIcon,
-  deepseek: DeepseekIcon,
-  mistral: MistralIcon,
-  openrouter: GlobeIcon,
-  "openai-compatible": PlugIcon,
-  lmstudio: ComputerIcon,
-  mlx: AppleIcon,
-  ollama: ServerStack01Icon,
-} as const satisfies Record<ProviderId, typeof ChatGptIcon>;
+import { ProviderIcon } from "@/settings/components/ProviderIcon";
 
 export function AiOpenButton({ onOpen }: { onOpen: () => void }) {
   return (
@@ -255,7 +240,7 @@ function ModelDropdown() {
           title={
             currentProviderHasKey
               ? `Model: ${current.label}`
-              : `${current.label} — no key configured`
+              : `${current.label} - no key configured`
           }
         >
           {current.label}
@@ -317,7 +302,6 @@ function ModelDropdown() {
           {/* Provider sidebar — configured first, unconfigured muted, no dividers. */}
           <div className="flex w-11 shrink-0 flex-col gap-0.5 overflow-y-auto border-r border-border/70 bg-muted/20 py-1.5">
             <ProviderPill
-              icon={AiBookIcon}
               title="All providers"
               active={activeProvider === null}
               onClick={() => setActiveProvider(null)}
@@ -326,11 +310,11 @@ function ModelDropdown() {
               (p) => (
                 <ProviderPill
                   key={p.id}
-                  icon={PROVIDER_ICON[p.id]}
+                  provider={p.id}
                   title={
                     hasKeyFor(p.id)
                       ? p.label
-                      : `${p.label} — not configured`
+                      : `${p.label} - not configured`
                   }
                   active={activeProvider === p.id}
                   muted={!hasKeyFor(p.id)}
@@ -407,7 +391,16 @@ function TabButton({
           : "text-muted-foreground hover:bg-accent/40 hover:text-foreground",
       )}
     >
-      <HugeiconsIcon icon={icon} strokeWidth={1.75} size={12} />
+      {label === "All" ? (
+        <img
+          src="/allai.svg"
+          alt="All"
+          style={{ width: 12, height: 12 }}
+          className={cn("dark:invert shrink-0 object-contain")}
+        />
+      ) : (
+        <HugeiconsIcon icon={icon} strokeWidth={1.75} size={12} />
+      )}
       {label}
       {count != null ? (
         <span className="rounded-full bg-muted/60 px-1.5 text-[9.5px] tabular-nums text-muted-foreground">
@@ -419,13 +412,13 @@ function TabButton({
 }
 
 function ProviderPill({
-  icon,
+  provider,
   title,
   active,
   muted,
   onClick,
 }: {
-  icon: typeof AiBookIcon;
+  provider?: ProviderId;
   title: string;
   active: boolean;
   muted?: boolean;
@@ -445,7 +438,16 @@ function ProviderPill({
             : "text-muted-foreground hover:bg-accent/40 hover:text-foreground",
       )}
     >
-      <HugeiconsIcon icon={icon} strokeWidth={1.75} size={16} />
+      {provider ? (
+        <ProviderIcon provider={provider} size={16} />
+      ) : (
+        <img
+          src="/allai.svg"
+          alt="All"
+          style={{ width: 16, height: 16 }}
+          className={cn("dark:invert shrink-0 object-contain")}
+        />
+      )}
     </button>
   );
 }
@@ -455,10 +457,9 @@ function ProviderHeader({ providerId }: { providerId: ProviderId }) {
   if (!p) return null;
   return (
     <div className="flex items-center gap-1.5 px-3 pt-1 pb-1.5 text-[11px] font-medium tracking-tight text-muted-foreground/90">
-      <HugeiconsIcon
-        icon={PROVIDER_ICON[p.id]}
+      <ProviderIcon
+        provider={p.id}
         size={13}
-        strokeWidth={1.75}
       />
       <span>{p.label}</span>
     </div>
@@ -536,10 +537,9 @@ function ModelRow({
       </button>
 
       {showProviderIcon ? (
-        <HugeiconsIcon
-          icon={PROVIDER_ICON[model.provider]}
+        <ProviderIcon
+          provider={model.provider}
           size={13}
-          strokeWidth={1.5}
           className="shrink-0 text-muted-foreground/70"
         />
       ) : null}

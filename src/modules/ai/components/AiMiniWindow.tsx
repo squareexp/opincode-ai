@@ -26,7 +26,6 @@ import type { SessionMeta } from "../lib/sessions";
 import { useMiniWindowGeometry } from "../lib/useMiniWindowGeometry";
 import { useAgentsStore } from "../store/agentsStore";
 import { getOrCreateChat, useChatStore } from "../store/chatStore";
-import { usePreferencesStore } from "@/modules/settings/preferences";
 import { usePlanStore } from "../store/planStore";
 import { AgentSwitcher } from "./AgentSwitcher";
 import { AiChatView } from "./AiChat";
@@ -323,10 +322,7 @@ function ContextIndicator({ messages }: { messages: UIMessage[] }) {
   const estimated = useMemo(() => estimateTokens(messages), [messages]);
   const used = lastInput > 0 ? lastInput : estimated;
   const reported = tokens.inputTokens + tokens.outputTokens;
-  const openaiCompatibleContextLimit = usePreferencesStore(
-    (s) => s.openaiCompatibleContextLimit,
-  );
-  const max = getModelContextLimit(modelId, openaiCompatibleContextLimit);
+  const max = getModelContextLimit(modelId);
   const modelLabel = useMemo(() => {
     try {
       return getModel(modelId).label;

@@ -13,15 +13,8 @@ export const EMPTY_PROVIDER_KEYS: ProviderKeys = {
   openai: null,
   anthropic: null,
   google: null,
-  xai: null,
-  cerebras: null,
-  groq: null,
   deepseek: null,
-  mistral: null,
-  openrouter: null,
-  "openai-compatible": null,
-  lmstudio: null,
-  mlx: null,
+  xiaomi: null,
   ollama: null,
 };
 

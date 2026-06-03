@@ -33,16 +33,8 @@ import {
   setAutocompleteModelId,
   setAutocompleteProvider,
   setDefaultModel,
-  setLmstudioBaseURL,
-  setLmstudioModelId,
-  setMlxBaseURL,
-  setMlxModelId,
   setOllamaBaseURL,
   setOllamaModelId,
-  setOpenaiCompatibleBaseURL,
-  setOpenaiCompatibleContextLimit,
-  setOpenaiCompatibleModelId,
-  setOpenrouterModelId,
 } from "@/modules/settings/store";
 import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
@@ -63,49 +55,11 @@ type LocalMeta = {
 };
 
 const LOCAL_META: Partial<Record<ProviderId, LocalMeta>> = {
-  lmstudio: {
-    urlPlaceholder: "http://localhost:1234/v1",
-    modelPlaceholder: "qwen2.5-coder-7b-instruct",
-    description:
-      "Run GGUF models via LM Studio's HTTP server (Developer tab → enable).",
-    modelHint: (
-      <>
-        The model id loaded in LM Studio — see the server's{" "}
-        <span className="font-mono">/v1/models</span> page.
-      </>
-    ),
-  },
-  mlx: {
-    urlPlaceholder: "http://127.0.0.1:8080/v1",
-    modelPlaceholder: "mlx-community/Qwen2.5-Coder-7B-Instruct-4bit",
-    description:
-      "Apple-silicon inference via mlx_lm.server (pip install mlx-lm).",
-    modelHint: (
-      <>The Hugging Face repo path you launched mlx_lm.server with.</>
-    ),
-  },
   ollama: {
     urlPlaceholder: "http://localhost:11434/v1",
     modelPlaceholder: "qwen2.5-coder:7b",
     description: "Local models via Ollama's built-in OpenAI-compatible API.",
     modelHint: <>The model name from `ollama list` / `ollama pull`.</>,
-  },
-  "openai-compatible": {
-    urlPlaceholder: "https://api.example.com/v1",
-    modelPlaceholder: "gpt-4o, qwen3-max, glm-4.6, …",
-    description: "Any OpenAI-compatible endpoint — vLLM, Z.AI, Fireworks, etc.",
-    modelHint: null,
-  },
-  openrouter: {
-    urlPlaceholder: "",
-    modelPlaceholder: "anthropic/claude-sonnet-4-6, openai/gpt-5.5, …",
-    description: "Any model on OpenRouter — type its full provider/model id.",
-    modelHint: (
-      <>
-        Browse ids at{" "}
-        <span className="font-mono">openrouter.ai/models</span>.
-      </>
-    ),
   },
 };
 
@@ -114,18 +68,8 @@ export function ModelsSection() {
   const [adding, setAdding] = useState<Set<ProviderId>>(new Set());
 
   const defaultModel = usePreferencesStore((s) => s.defaultModelId);
-  const lmstudioBaseURL = usePreferencesStore((s) => s.lmstudioBaseURL);
-  const lmstudioModelId = usePreferencesStore((s) => s.lmstudioModelId);
-  const mlxBaseURL = usePreferencesStore((s) => s.mlxBaseURL);
-  const mlxModelId = usePreferencesStore((s) => s.mlxModelId);
   const ollamaBaseURL = usePreferencesStore((s) => s.ollamaBaseURL);
   const ollamaModelId = usePreferencesStore((s) => s.ollamaModelId);
-  const compatBaseURL = usePreferencesStore((s) => s.openaiCompatibleBaseURL);
-  const compatModelId = usePreferencesStore((s) => s.openaiCompatibleModelId);
-  const compatContextLimit = usePreferencesStore(
-    (s) => s.openaiCompatibleContextLimit,
-  );
-  const openrouterModelId = usePreferencesStore((s) => s.openrouterModelId);
 
   useEffect(() => {
     void getAllKeys().then(setKeys);
@@ -145,20 +89,6 @@ export function ModelsSection() {
 
   const localConfig = (id: ProviderId): LocalConfig | null => {
     switch (id) {
-      case "lmstudio":
-        return {
-          baseURL: lmstudioBaseURL,
-          modelId: lmstudioModelId,
-          setBaseURL: setLmstudioBaseURL,
-          setModelId: setLmstudioModelId,
-        };
-      case "mlx":
-        return {
-          baseURL: mlxBaseURL,
-          modelId: mlxModelId,
-          setBaseURL: setMlxBaseURL,
-          setModelId: setMlxModelId,
-        };
       case "ollama":
         return {
           baseURL: ollamaBaseURL,
@@ -166,41 +96,20 @@ export function ModelsSection() {
           setBaseURL: setOllamaBaseURL,
           setModelId: setOllamaModelId,
         };
-      case "openai-compatible":
-        return {
-          baseURL: compatBaseURL,
-          modelId: compatModelId,
-          setBaseURL: setOpenaiCompatibleBaseURL,
-          setModelId: setOpenaiCompatibleModelId,
-          contextLimit: compatContextLimit,
-          setContextLimit: setOpenaiCompatibleContextLimit,
-        };
-      case "openrouter":
-        return {
-          baseURL: "",
-          modelId: openrouterModelId,
-          setBaseURL: async () => {},
-          setModelId: setOpenrouterModelId,
-          noBaseURL: true,
-        };
       default:
         return null;
     }
   };
 
   const isConfigured = (id: ProviderId): boolean => {
-    if (id === "openrouter")
-      return !!keys?.[id] && !!openrouterModelId.trim();
     if (!isLocalProvider(id)) return !!keys?.[id];
     const cfg = localConfig(id);
     if (!cfg) return false;
-    if (id === "openai-compatible")
-      return !!cfg.baseURL.trim() && !!cfg.modelId.trim();
     return !!cfg.modelId.trim();
   };
 
   if (!keys) {
-    return <div className="text-[12px] text-muted-foreground">Loading…</div>;
+    return <div className="text-[12px] text-muted-foreground">Loading...</div>;
   }
 
   const configuredIds = new Set(
@@ -212,16 +121,11 @@ export function ModelsSection() {
   const addableProviders = PROVIDERS.filter((p) => !visibleIds.has(p.id));
 
   const removeProvider = (id: ProviderId) => {
-    if (id === "openrouter") {
-      void setOpenrouterModelId("");
-      void onClearKey(id);
-    } else if (isLocalProvider(id)) {
+    if (isLocalProvider(id)) {
       const cfg = localConfig(id);
       if (cfg) {
         void cfg.setModelId("");
-        if (id === "openai-compatible") void cfg.setBaseURL("");
       }
-      if (id === "openai-compatible") void onClearKey(id);
     } else {
       void onClearKey(id);
     }
@@ -264,26 +168,19 @@ export function ModelsSection() {
               No providers connected yet.
             </p>
             <p className="mt-0.5 text-[10.5px] text-muted-foreground/70">
-              Click “Add provider” to connect a cloud or local model source.
+              Click "Add provider" to connect a cloud or local model source.
             </p>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
             {visibleProviders.map((p) =>
-              isLocalProvider(p.id) || p.id === "openrouter" ? (
+              isLocalProvider(p.id) ? (
                 <LocalProviderCard
                   key={p.id}
                   provider={p}
                   configured={configuredIds.has(p.id)}
                   config={localConfig(p.id)!}
                   meta={LOCAL_META[p.id]!}
-                  compatKey={
-                    p.id === "openai-compatible" || p.id === "openrouter"
-                      ? keys[p.id]
-                      : undefined
-                  }
-                  onSaveKey={(v) => onSaveKey(p.id, v)}
-                  onClearKey={() => onClearKey(p.id)}
                   onRemove={() => removeProvider(p.id)}
                 />
               ) : (
@@ -309,9 +206,6 @@ type LocalConfig = {
   modelId: string;
   setBaseURL: (v: string) => Promise<void>;
   setModelId: (v: string) => Promise<void>;
-  contextLimit?: number;
-  setContextLimit?: (v: number) => Promise<void>;
-  noBaseURL?: boolean;
 };
 
 function AddProviderMenu({
@@ -605,7 +499,7 @@ function AutocompleteRow({
       </FieldRow>
       {enabled && !hasKey ? (
         <p className="pl-19 text-[10.5px] text-muted-foreground">
-          {getProvider(provider).label} isn't connected — add it below.
+          {getProvider(provider).label} isn't connected, add it below.
         </p>
       ) : null}
     </>
@@ -617,18 +511,12 @@ function LocalProviderCard({
   configured,
   config,
   meta,
-  compatKey,
-  onSaveKey,
-  onClearKey,
   onRemove,
 }: {
   provider: ProviderInfo;
   configured: boolean;
   config: LocalConfig;
   meta: LocalMeta;
-  compatKey?: string | null;
-  onSaveKey: (v: string) => Promise<void>;
-  onClearKey: () => Promise<void>;
   onRemove: () => void;
 }) {
   const {
@@ -636,24 +524,15 @@ function LocalProviderCard({
     modelId,
     setBaseURL,
     setModelId,
-    contextLimit,
-    setContextLimit,
-    noBaseURL,
   } = config;
   const [urlDraft, setUrlDraft] = useState(baseURL);
   const [modelDraft, setModelDraft] = useState(modelId);
-  const [contextDraft, setContextDraft] = useState(String(contextLimit ?? ""));
-  const [keyDraft, setKeyDraft] = useState("");
   const [testStatus, setTestStatus] = useState<
     "idle" | "testing" | "ok" | "fail"
   >("idle");
 
   useEffect(() => setUrlDraft(baseURL), [baseURL]);
   useEffect(() => setModelDraft(modelId), [modelId]);
-  useEffect(() => setContextDraft(String(contextLimit ?? "")), [contextLimit]);
-
-  const supportsKey =
-    provider.id === "openai-compatible" || provider.id === "openrouter";
 
   const test = async () => {
     setTestStatus("testing");
@@ -703,32 +582,30 @@ function LocalProviderCard({
       </span>
 
       <div className="mt-0.5 flex flex-col gap-2.5">
-        {noBaseURL ? null : (
-          <FieldRow label="Base URL">
-            <div className="flex flex-1 gap-1.5">
-              <Input
-                value={urlDraft}
-                onChange={(e) => setUrlDraft(e.target.value)}
-                onBlur={() => {
-                  const v = urlDraft.trim();
-                  if (v !== baseURL) void setBaseURL(v);
-                }}
-                placeholder={meta.urlPlaceholder}
-                spellCheck={false}
-                className="h-8 flex-1 font-mono text-[11.5px]"
-              />
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => void test()}
-                disabled={!urlDraft.trim()}
-                className="h-8 px-3 text-[11px]"
-              >
-                Test
-              </Button>
-            </div>
-          </FieldRow>
-        )}
+        <FieldRow label="Base URL">
+          <div className="flex flex-1 gap-1.5">
+            <Input
+              value={urlDraft}
+              onChange={(e) => setUrlDraft(e.target.value)}
+              onBlur={() => {
+                const v = urlDraft.trim();
+                if (v !== baseURL) void setBaseURL(v);
+              }}
+              placeholder={meta.urlPlaceholder}
+              spellCheck={false}
+              className="h-8 flex-1 font-mono text-[11.5px]"
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => void test()}
+              disabled={!urlDraft.trim()}
+              className="h-8 px-3 text-[11px]"
+            >
+              Test
+            </Button>
+          </div>
+        </FieldRow>
 
         <FieldRow label="Model ID">
           <Input
@@ -743,71 +620,6 @@ function LocalProviderCard({
             className="h-8 font-mono text-[11.5px]"
           />
         </FieldRow>
-
-        {setContextLimit ? (
-          <FieldRow label="Context">
-            <div className="flex flex-1 items-center gap-1.5">
-              <Input
-                value={contextDraft}
-                onChange={(e) => setContextDraft(e.target.value)}
-                onBlur={() => {
-                  const v = parseInt(contextDraft);
-                  if (Number.isFinite(v) && v >= 1000) void setContextLimit(v);
-                  else setContextDraft(String(contextLimit ?? ""));
-                }}
-                placeholder="128000"
-                spellCheck={false}
-                className="h-8 w-28 font-mono text-[11.5px]"
-              />
-              <span className="text-[10.5px] text-muted-foreground">tokens</span>
-            </div>
-          </FieldRow>
-        ) : null}
-
-        {supportsKey ? (
-          <FieldRow label="API key">
-            {compatKey ? (
-              <div className="flex flex-1 items-center gap-1.5">
-                <code className="flex-1 truncate rounded bg-muted/40 px-2 py-1 font-mono text-[11px] text-muted-foreground">
-                  {`${compatKey.slice(0, 4)}${"•".repeat(8)}${compatKey.slice(-4)}`}
-                </code>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => void onClearKey()}
-                  title="Remove key"
-                  className="size-7 text-muted-foreground hover:text-destructive"
-                >
-                  <CloseCircle variant="Linear" size={12}  color="currentColor"/>
-                </Button>
-              </div>
-            ) : (
-              <div className="flex flex-1 gap-1.5">
-                <Input
-                  type="password"
-                  value={keyDraft}
-                  onChange={(e) => setKeyDraft(e.target.value)}
-                  placeholder="Optional — leave empty for unauthenticated endpoints"
-                  spellCheck={false}
-                  className="h-8 flex-1 font-mono text-[11.5px]"
-                />
-                <Button
-                  size="sm"
-                  onClick={async () => {
-                    const v = keyDraft.trim();
-                    if (!v) return;
-                    await onSaveKey(v);
-                    setKeyDraft("");
-                  }}
-                  disabled={!keyDraft.trim()}
-                  className="h-8 px-3 text-[11px]"
-                >
-                  Save
-                </Button>
-              </div>
-            )}
-          </FieldRow>
-        ) : null}
 
         <StatusLine status={testStatus} />
 

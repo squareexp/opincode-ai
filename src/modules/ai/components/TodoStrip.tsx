@@ -59,8 +59,8 @@ function TodoRow({ todo }: { todo: Todo }) {
   const row = (
     <li
       className={cn(
-        "flex items-start gap-2 rounded px-1.5 py-1 text-[11px] leading-snug",
-        isInProgress && "border-l-2 border-foreground/50 bg-muted/40",
+        "flex items-start gap-2 rounded px-1.5 py-1 text-[11px] leading-snug transition-all",
+        isInProgress && "bg-muted/40",
       )}
     >
       <span className="mt-[2px] inline-flex size-3.5 shrink-0 items-center justify-center">

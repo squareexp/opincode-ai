@@ -1,22 +1,7 @@
 import { HugeiconsIcon } from '@hugeicons/react';
 import type { ProviderId } from "@/modules/ai/config";
-import { AppleIcon, ChatGptIcon, ClaudeIcon, ComputerIcon, FlashIcon, GoogleGeminiIcon, Grok02Icon, CpuIcon, DeepseekIcon, GlobeIcon, MistralIcon, PlugIcon, ServerStack01Icon } from '@hugeicons/core-free-icons';
-
-const ICON_BY_PROVIDER = {
-  openai: ChatGptIcon,
-  anthropic: ClaudeIcon,
-  google: GoogleGeminiIcon,
-  xai: Grok02Icon,
-  cerebras: CpuIcon,
-  groq: FlashIcon,
-  deepseek: DeepseekIcon,
-  mistral: MistralIcon,
-  openrouter: GlobeIcon,
-  "openai-compatible": PlugIcon,
-  lmstudio: ComputerIcon,
-  mlx: AppleIcon,
-  ollama: ServerStack01Icon,
-} as const satisfies Record<ProviderId, typeof ChatGptIcon>;
+import { ComputerIcon } from '@hugeicons/core-free-icons';
+import { cn } from "@/lib/utils";
 
 type Props = {
   provider: ProviderId;
@@ -25,12 +10,72 @@ type Props = {
 };
 
 export function ProviderIcon({ provider, size = 14, className }: Props) {
+  if (provider === "google") {
+    return (
+      <img
+        src="/gemin.svg"
+        alt="Google"
+        style={{ width: size, height: size }}
+        className={cn("dark:invert shrink-0 object-contain", className)}
+      />
+    );
+  }
+  if (provider === "xiaomi") {
+    return (
+      <img
+        src="/xiom.svg"
+        alt="Xiaomi"
+        style={{ width: size, height: size }}
+        className={cn("dark:invert shrink-0 object-contain", className)}
+      />
+    );
+  }
+  if (provider === "anthropic") {
+    return (
+      <img
+        src="/claude.svg"
+        alt="Claude"
+        style={{ width: size, height: size }}
+        className={cn("dark:invert shrink-0 object-contain", className)}
+      />
+    );
+  }
+  if (provider === "ollama") {
+    return (
+      <img
+        src="/ollama.svg"
+        alt="Ollama"
+        style={{ width: size, height: size }}
+        className={cn("dark:invert shrink-0 object-contain", className)}
+      />
+    );
+  }
+  if (provider === "deepseek") {
+    return (
+      <img
+        src="/deepseek.svg"
+        alt="DeepSeek"
+        style={{ width: size, height: size }}
+        className={cn("dark:invert shrink-0 object-contain", className)}
+      />
+    );
+  }
+  if (provider === "openai") {
+    return (
+      <img
+        src="/openai.svg"
+        alt="OpenAI"
+        style={{ width: size, height: size }}
+        className={cn("dark:invert shrink-0 object-contain", className)}
+      />
+    );
+  }
   return (
     <HugeiconsIcon
-      icon={ICON_BY_PROVIDER[provider]}
+      icon={ComputerIcon}
       size={size}
       strokeWidth={1.75}
-      className={className}
+      className={cn("shrink-0", className)}
     />
   );
 }
