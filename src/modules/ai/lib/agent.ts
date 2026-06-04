@@ -287,13 +287,16 @@ export async function runAgentStream(opts: RunAgentOptions) {
   }
   messages.push(...compactedHistory);
 
+  const modelInfo = getModel(modelId);
+  const supportsTools = !modelInfo.tags || modelInfo.tags.includes("tools");
+
   const finalMessages = applyCacheBreakpoints(messages, provider);
 
   let stepsSeen = 0;
   return streamText({
     model,
     messages: finalMessages,
-    tools: buildTools(opts.toolContext),
+    ...(supportsTools ? { tools: buildTools(opts.toolContext) } : {}),
     stopWhen: stepCountIs(MAX_AGENT_STEPS),
     abortSignal: opts.abortSignal,
     onStepFinish: (step) => {

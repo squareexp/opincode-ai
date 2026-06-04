@@ -292,22 +292,13 @@ export const MODELS = [
     tags: ["reasoning", "tools", "coding"],
   },
   {
-    id: "mimo-v2-flash",
+    id: "mimo-v2-omni",
     provider: "xiaomi",
-    label: "MiMo-V2-Flash",
-    hint: "Fast",
-    description: "Snappy, lightweight flash model.",
-    capabilities: { intelligence: 3, speed: 5, cost: 5 },
-    tags: ["tools"],
-  },
-  {
-    id: "mimo-7b-rl",
-    provider: "xiaomi",
-    label: "MiMo-7B-RL",
-    hint: "Specialized",
-    description: "Specialized 7B reasoning model for math and programming.",
-    capabilities: { intelligence: 4, speed: 4, cost: 4 },
-    tags: ["reasoning", "coding"],
+    label: "MiMo-V2-Omni",
+    hint: "Omni",
+    description: "Multimodal omni model for text and media tasks.",
+    capabilities: { intelligence: 4, speed: 4, cost: 3 },
+    tags: ["vision", "tools", "coding"],
   },
 
 
@@ -378,8 +369,7 @@ export const MODEL_CONTEXT_LIMITS: Record<string, number> = {
   "mimo-v2.5-pro": 1_000_000,
   "mimo-v2.5": 1_000_000,
   "mimo-v2-pro": 1_000_000,
-  "mimo-v2-flash": 1_000_000,
-  "mimo-7b-rl": 128_000,
+  "mimo-v2-omni": 1_000_000,
   "ollama-local": 32_000,
 };
 
@@ -418,8 +408,7 @@ export const MODEL_PRICING: Record<string, ModelPricing> = {
   "mimo-v2.5-pro": { input: 0.3, output: 1.2, cacheRead: 0.03 },
   "mimo-v2.5": { input: 0.1, output: 0.4, cacheRead: 0.01 },
   "mimo-v2-pro": { input: 0.15, output: 0.6, cacheRead: 0.015 },
-  "mimo-v2-flash": { input: 0.05, output: 0.2, cacheRead: 0.005 },
-  "mimo-7b-rl": { input: 0.05, output: 0.2, cacheRead: 0.005 },
+  "mimo-v2-omni": { input: 0.1, output: 0.4, cacheRead: 0.01 },
 };
 
 export function estimateCost(
@@ -464,7 +453,7 @@ export const DEFAULT_AUTOCOMPLETE_MODEL: Partial<Record<ProviderId, string>> = {
   anthropic: "claude-haiku-4-5",
   google: "gemini-2.5-flash",
   deepseek: "deepseek-v4-flash",
-  xiaomi: "mimo-v2-flash",
+  xiaomi: "mimo-v2.5",
 };
 
 /** Curated list of fast models suitable for inline completion (speed >= 4). */

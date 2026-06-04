@@ -11,6 +11,7 @@ import {
   type AgentRunStatus,
 } from "../store/chatStore";
 import { usePreferencesStore } from "@/modules/settings/preferences";
+import { playAgentSound } from "@/modules/agents/lib/sound";
 
 /**
  * Headless bridge that mirrors chat lifecycle into the store, so the status
@@ -70,8 +71,8 @@ function Bridge({
   const setApprovalResponder = useChatStore((s) => s.setApprovalResponder);
   const yoloMode = usePreferencesStore((s) => s.yoloMode);
 
-  // Expose the approval responder so the diff tab can resolve approvals.
-  // We keep it in a ref-stable closure so identity is stable per render.
+  // * @Ajmalleoanrd: Expose the approval responder so the diff tab can resolve approvals.
+  // ? We keep it in a ref-stable closure so identity is stable per render.
   useEffect(() => {
     setApprovalResponder((id, approved) =>
       addToolApprovalResponse({ id, approved }),
@@ -83,8 +84,8 @@ function Bridge({
     persistMessages(sessionId, messages);
   }, [sessionId, messages, persistMessages]);
 
-  // Flush the debounced write whenever the chat goes idle (or errors),
-  // and on unmount, so a closed app or session-switch never loses the tail.
+  // ! Flush the debounced write whenever the chat goes idle (or errors),
+  // ! and on unmount, so a closed app or session-switch never loses the tail.
   useEffect(() => {
     if (status !== "submitted" && status !== "streaming") {
       flushPersist(sessionId);
@@ -145,6 +146,7 @@ function Bridge({
         autoApprovedRef.current.add(id);
         // Auto-approve without any user interaction.
         addToolApprovalResponse({ id, approved: true });
+        playAgentSound("yolo");
       }
     }
   }, [yoloMode, messages, addToolApprovalResponse]);
@@ -188,7 +190,7 @@ function Bridge({
       approvalId: string;
       path: string;
       /**
-       * Either a literal proposed content (write_file), or a function that
+       * @ajmalleonard Either a literal proposed content (write_file), or a function that
        * derives proposed content from the on-disk original (edit/multi_edit).
        */
       derive:

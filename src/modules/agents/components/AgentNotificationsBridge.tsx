@@ -4,6 +4,7 @@ import { listen } from "@tauri-apps/api/event";
 import { useEffect, useRef } from "react";
 import { maybeTriggerManagedReview } from "../lib/review";
 import { routeAgentNotification } from "../lib/route";
+import { playAgentSound } from "../lib/sound";
 import type { AgentSession, AgentSignal } from "../lib/types";
 import { useWindowFocus } from "../lib/useWindowFocus";
 import { useAgentStore } from "../store/agentStore";
@@ -66,6 +67,7 @@ function handleSignal(sig: AgentSignal, ctx: Ctx): void {
       const info = tabInfo(ctx.tabs, leafId);
       if (!info) return;
       store.start(leafId, info.tabId, sig.agent ?? "agent");
+      playAgentSound("started");
       return;
     }
     case "working":
@@ -75,6 +77,7 @@ function handleSignal(sig: AgentSignal, ctx: Ctx): void {
       store.setStatus(leafId, "waiting");
       const session = store.sessions[leafId];
       if (session) route(session, "attention", ctx);
+      playAgentSound("attention");
       return;
     }
     case "finished": {
@@ -82,11 +85,13 @@ function handleSignal(sig: AgentSignal, ctx: Ctx): void {
       const session = store.sessions[leafId];
       if (session) route(session, "finished", ctx);
       maybeTriggerManagedReview(leafId);
+      playAgentSound("finished");
       return;
     }
     case "exited":
       store.finish(leafId);
       useManagedAgentsStore.getState().remove(leafId);
+      playAgentSound("exited");
       return;
   }
 }

@@ -78,6 +78,8 @@ export type Preferences = {
   yoloMode: boolean;
   /** Show inline history-based suggestions in the terminal. */
   terminalSuggestionsEnabled: boolean;
+  agentSoundEnabled: boolean;
+  agentSoundVolume: number;
 };
 
 const STORE_PATH = "opincode-settings.json";
@@ -113,6 +115,8 @@ const KEY_AGENT_NOTIFICATIONS = "agentNotifications";
 const KEY_SHORTCUTS = "shortcuts";
 const KEY_YOLO_MODE = "yoloMode";
 const KEY_TERMINAL_SUGGESTIONS = "terminalSuggestionsEnabled";
+const KEY_AGENT_SOUND_ENABLED = "agentSoundEnabled";
+const KEY_AGENT_SOUND_VOLUME = "agentSoundVolume";
 
 export const TERMINAL_FONT_SIZE_DEFAULT = 14;
 export const TERMINAL_FONT_SIZE_MIN = 8;
@@ -161,6 +165,8 @@ export const DEFAULT_PREFERENCES: Preferences = {
   shortcuts: {} as Record<ShortcutId, KeyBinding[]>,
   yoloMode: false,
   terminalSuggestionsEnabled: true,
+  agentSoundEnabled: true,
+  agentSoundVolume: 0.5,
 };
 
 const store = new LazyStore(STORE_PATH, { defaults: {}, autoSave: 200 });
@@ -267,6 +273,12 @@ export async function loadPreferences(): Promise<Preferences> {
     terminalSuggestionsEnabled:
       get<boolean>(KEY_TERMINAL_SUGGESTIONS) ??
       DEFAULT_PREFERENCES.terminalSuggestionsEnabled,
+    agentSoundEnabled:
+      get<boolean>(KEY_AGENT_SOUND_ENABLED) ??
+      DEFAULT_PREFERENCES.agentSoundEnabled,
+    agentSoundVolume:
+      get<number>(KEY_AGENT_SOUND_VOLUME) ??
+      DEFAULT_PREFERENCES.agentSoundVolume,
   };
 }
 
@@ -433,6 +445,14 @@ export async function setTerminalSuggestionsEnabled(value: boolean): Promise<voi
   await writePref(KEY_TERMINAL_SUGGESTIONS, value);
 }
 
+export async function setAgentSoundEnabled(value: boolean): Promise<void> {
+  await writePref(KEY_AGENT_SOUND_ENABLED, value);
+}
+
+export async function setAgentSoundVolume(value: number): Promise<void> {
+  await writePref(KEY_AGENT_SOUND_VOLUME, value);
+}
+
 export type PrefKey = keyof Preferences;
 
 /** Subscribe to changes from any window (settings → main). */
@@ -471,6 +491,8 @@ export async function onPreferencesChange(
     [KEY_SHORTCUTS]: "shortcuts",
     [KEY_YOLO_MODE]: "yoloMode",
     [KEY_TERMINAL_SUGGESTIONS]: "terminalSuggestionsEnabled",
+    [KEY_AGENT_SOUND_ENABLED]: "agentSoundEnabled",
+    [KEY_AGENT_SOUND_VOLUME]: "agentSoundVolume",
   };
   // Same-process writes still fire onChange immediately; cross-window writes
   // arrive via the Tauri event emitted by writePref().

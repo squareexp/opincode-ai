@@ -2,10 +2,12 @@ import { routeAgentNotification } from "@/modules/agents/lib/route";
 import { useWindowFocus } from "@/modules/agents/lib/useWindowFocus";
 import { useAgentStore } from "@/modules/agents/store/agentStore";
 import type { AgentStatus } from "@/modules/agents/lib/types";
+import { playAgentSound } from "@/modules/agents/lib/sound";
 import { useEffect, useRef } from "react";
 import { useChatStore } from "../store/chatStore";
+import { useAgentsStore } from "../store/agentsStore";
 
-const AGENT = "OpinCode";
+
 
 type RunStatus =
   | "idle"
@@ -35,9 +37,20 @@ export function LocalAgentNotificationsBridge() {
   focusedRef.current = focused;
   const prev = useRef<RunStatus>(status);
 
+  const activeId = useAgentsStore((s) => s.activeId);
+  const activeAgent = useAgentsStore((s) => {
+    const list = s.all();
+    return list.find((a) => a.id === activeId) ?? list[0];
+  });
+  const agentName = activeAgent ? activeAgent.name : "OpinCode";
+
+  const activeSessionId = useChatStore((s) => s.activeSessionId);
+  const session = useChatStore((s) => s.sessions.find((se) => se.id === activeSessionId));
+  const taskTitle = session && session.title !== "New chat" ? session.title : "Your task is ready";
+
   useEffect(() => {
     useAgentStore.getState().setLocalAgent(
-      liveStatus(status) ? { agent: AGENT, status: liveStatus(status)! } : null,
+      liveStatus(status) ? { agent: agentName, status: liveStatus(status)! } : null,
     );
 
     const was = prev.current;
@@ -51,7 +64,7 @@ export function LocalAgentNotificationsBridge() {
     ) =>
       routeAgentNotification({
         source: "local",
-        agent: AGENT,
+        agent: agentName,
         kind,
         title,
         body,
@@ -62,13 +75,18 @@ export function LocalAgentNotificationsBridge() {
       });
 
     if (status === "awaiting-approval") {
-      fire("attention", "OpinCode needs your approval", "Approve a tool to continue");
+      fire("attention", `${agentName} needs your approval`, "Approve a tool to continue");
+      playAgentSound("attention");
     } else if (status === "error") {
-      fire("error", "OpinCode run failed", error ?? undefined);
+      fire("error", `${agentName} run failed`, error ?? undefined);
+      playAgentSound("error");
     } else if (status === "idle" && isBusy(was)) {
-      fire("finished", "OpinCode finished", "Your task is ready");
+      fire("finished", `${agentName} finished`, taskTitle);
+      playAgentSound("finished");
+    } else if (isBusy(status) && !isBusy(was)) {
+      playAgentSound("started");
     }
-  }, [status, error]);
+  }, [status, error, agentName, taskTitle]);
 
   return null;
 }

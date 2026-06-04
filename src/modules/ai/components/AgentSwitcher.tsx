@@ -1,4 +1,4 @@
-import { HugeiconsIcon } from '@hugeicons/react';
+
 import { ArrowDown2, Setting2, TickCircle } from 'iconsax-react';
 import { Button } from "@/components/ui/button";
 
@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { openSettingsWindow } from "@/modules/settings/openSettingsWindow";
 import type { AgentIconId } from "../lib/agents";
 import { useAgentsStore } from "../store/agentsStore";
+import { AgentIcon } from "@/modules/agents/lib/agentIcon";
 
 const ICONS: Record<AgentIconId, typeof CodeIcon> = {
   coder: CodeIcon,
@@ -36,27 +37,34 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
   const active = list.find((a) => a.id === activeId) ?? list[0];
   const builtIn = list.filter((a) => a.builtIn);
   const custom = list.filter((a) => !a.builtIn);
-  const ActiveIcon = ICONS[active.icon] ?? SparklesIcon;
+
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger className="antialiased" asChild>
         <Button
           size="xs"
-          variant="outline"
+          variant="secondary"
           className={cn(
             !isMiniWindow
-              ? "flex h-6 items-center gap-1 rounded-md border border-border/60 bg-card px-1.5 text-[10.5px] text-muted-foreground transition-colors hover:border-border hover:bg-accent hover:text-foreground"
+              ? "flex h-6 items-center   gap-1 rounded-full border border-border/60 bg-card p-4 text-[10.5px] text-muted-foreground transition-colors hover:border-border hover:bg-accent hover:text-foreground"
               : "text-xs mr-1",
           )}
           title={`Agent: ${active.name}`}
         >
-          <HugeiconsIcon icon={ActiveIcon} strokeWidth={1.75} size={11} />
-          <span className="max-w-[7rem] truncate">{active.name}</span>
-          <ArrowDown2 variant="Linear"
+          <AgentIcon
+            agent={active.name}
+            size={11}
+            showBg={false}
+            className="shrink-0"
+          />
+          <span className="max-w-28 truncate">{active.name}</span>
+          <ArrowDown2
+            variant="Linear"
             size={10}
             className="opacity-70"
-           color="currentColor"/>
+            color="currentColor"
+          />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="min-w-60">
@@ -64,7 +72,6 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
           Built-in
         </div>
         {builtIn.map((a) => {
-          const Icon = ICONS[a.icon] ?? SparklesIcon;
           return (
             <DropdownMenuItem
               key={a.id}
@@ -74,15 +81,7 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
                 a.id === activeId && "bg-accent/40",
               )}
             >
-              <HugeiconsIcon icon={Icon} strokeWidth={1.75} 
-                size={13}
-                className={cn(
-                  "mt-0.5",
-                  a.id === activeId
-                    ? "text-foreground"
-                    : "text-muted-foreground",
-                )}
-              />
+              <AgentIcon agent={a.name} size={14} className="mt-0.5 shrink-0" />
               <span className="flex min-w-0 flex-1 flex-col">
                 <span>{a.name}</span>
                 <span className="line-clamp-1 text-[10.5px] text-muted-foreground">
@@ -90,10 +89,12 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
                 </span>
               </span>
               {a.id === activeId ? (
-                <TickCircle variant="Linear"
+                <TickCircle
+                  variant="Linear"
                   size={12}
                   className="mt-0.5 shrink-0 text-foreground"
-                 color="currentColor"/>
+                  color="currentColor"
+                />
               ) : null}
             </DropdownMenuItem>
           );
@@ -105,7 +106,6 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
               Custom
             </div>
             {custom.map((a) => {
-              const Icon = ICONS[a.icon] ?? SparklesIcon;
               return (
                 <DropdownMenuItem
                   key={a.id}
@@ -115,9 +115,10 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
                     a.id === activeId && "bg-accent/40",
                   )}
                 >
-                  <HugeiconsIcon icon={Icon} strokeWidth={1.75} 
-                    size={13}
-                    className="mt-0.5 text-muted-foreground"
+                  <AgentIcon
+                    agent={a.name}
+                    size={14}
+                    className="mt-0.5 shrink-0"
                   />
                   <span className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate">{a.name}</span>
@@ -128,10 +129,12 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
                     ) : null}
                   </span>
                   {a.id === activeId ? (
-                    <TickCircle variant="Linear"
+                    <TickCircle
+                      variant="Linear"
                       size={12}
                       className="mt-0.5 shrink-0 text-foreground"
-                     color="currentColor"/>
+                      color="currentColor"
+                    />
                   ) : null}
                 </DropdownMenuItem>
               );
@@ -143,7 +146,7 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
           onSelect={() => void openSettingsWindow("agents")}
           className="gap-2 text-[12px] text-muted-foreground"
         >
-          <Setting2 variant="Linear" size={12}  color="currentColor"/>
+          <Setting2 variant="Linear" size={12} color="currentColor" />
           Manage agents…
         </DropdownMenuItem>
       </DropdownMenuContent>

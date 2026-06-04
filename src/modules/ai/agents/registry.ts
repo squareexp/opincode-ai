@@ -5,7 +5,7 @@ export type SubagentDef = {
   label: string;
   description: string;
   /**
-   * Whitelist of tools the subagent may call. Excludes mutating tools and
+   * @ajmalleonard Whitelist of tools the subagent may call. Excludes mutating tools and
    * `run_subagent` itself to prevent recursion. The runner filters down the
    * main toolset to this list before constructing the inner Agent.
    */

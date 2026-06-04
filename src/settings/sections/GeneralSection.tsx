@@ -34,6 +34,8 @@ import {
   setVimMode,
   setYoloMode,
   setZoomLevel,
+  setAgentSoundEnabled,
+  setAgentSoundVolume,
 } from "@/modules/settings/store";
 import { useTheme } from "@/modules/theme";
 import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
@@ -78,6 +80,8 @@ export function GeneralSection() {
   const terminalSuggestionsEnabled = usePreferencesStore(
     (s) => s.terminalSuggestionsEnabled,
   );
+  const agentSoundEnabled = usePreferencesStore((s) => s.agentSoundEnabled);
+  const agentSoundVolume = usePreferencesStore((s) => s.agentSoundVolume);
 
   useEffect(() => {
     let alive = true;
@@ -316,6 +320,32 @@ export function GeneralSection() {
             onCheckedChange={(v) => void setAgentNotifications(v)}
           />
         </SettingRow>
+        <SettingRow
+          title="Sound effects"
+          description="Play sound notifications when an agent starts a task, finishes, requires approval/attention, or fails."
+        >
+          <Switch
+            checked={agentSoundEnabled}
+            onCheckedChange={(v) => void setAgentSoundEnabled(v)}
+          />
+        </SettingRow>
+        {agentSoundEnabled && (
+          <div className="flex flex-col gap-3 rounded-lg border border-border/60 bg-card/60 p-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[12.5px] font-medium">Sound volume</span>
+              <span className="tabular-nums text-[11px] text-muted-foreground">
+                {Math.round(agentSoundVolume * 100)}%
+              </span>
+            </div>
+            <Slider
+              value={[agentSoundVolume]}
+              min={0}
+              max={1}
+              step={0.05}
+              onValueChange={(v) => void setAgentSoundVolume(v[0] ?? 0.5)}
+            />
+          </div>
+        )}
         <SettingRow
           title={
             <span className="inline-flex items-center gap-1.5">

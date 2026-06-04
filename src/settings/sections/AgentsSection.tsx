@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { AGENT_ICONS } from "@/modules/ai/components/AgentSwitcher";
+import { AgentIcon } from "@/modules/agents/lib/agentIcon";
 import {
   BUILTIN_AGENTS,
   type Agent,
@@ -229,7 +230,6 @@ function AgentCard({
   onEdit: (() => void) | null;
   onDelete: (() => void) | null;
 }) {
-  const Icon = AGENT_ICONS[agent.icon] ?? SparklesIcon;
   return (
     <div
       className={cn(
@@ -240,9 +240,7 @@ function AgentCard({
       )}
     >
       <div className="flex items-start gap-2">
-        <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-muted/40">
-          <HugeiconsIcon icon={Icon} strokeWidth={1.75}  size={14} />
-        </div>
+        <AgentIcon agent={agent.name} size={20} className="shrink-0" />
         <div className="flex min-w-0 flex-1 flex-col">
           <span className="flex items-center gap-1.5 text-[12.5px] font-medium">
             {agent.name}

@@ -210,7 +210,7 @@ export function AiInputBar() {
       : null;
 
   return (
-    <div className="shrink-0 border-t border-border/60 bg-card/40 px-3 py-2">
+    <div className="shrink-0   border-border/60 bg-card/40 px-3 py-2">
       <div
         className={cn(
           "flex flex-col gap-1.5 rounded-lg px-1 py-1",
@@ -234,7 +234,7 @@ export function AiInputBar() {
 
         <Popover open={pickerOpen}>
           <PopoverAnchor asChild>
-            <div className="flex items-start gap-2 rounded-full border border-border/60  px-3 py-2 focus-within:border-border">
+            <div className="flex max-w-4xl items-start gap-2 rounded-4xl bg-gray-400/10   px-3 py-2 focus-within:border-border">
               <textarea
                 ref={c.textareaRef}
                 value={c.value}
@@ -283,7 +283,7 @@ export function AiInputBar() {
                   }
                 }}
                 placeholder="Ask OpinCode anything   -   # for snippets and commands, @ for files"
-                rows={1}
+                rows={3}
                 className={cn(
                   "max-h-40 flex-1 resize-none bg-transparent text-[13px] leading-relaxed outline-none",
                   "placeholder:text-muted-foreground/60",

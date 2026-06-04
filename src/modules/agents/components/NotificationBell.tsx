@@ -49,7 +49,7 @@ function StatusRow({
       <AgentIcon
         agent={agent}
         size={16}
-        className="shrink-0 text-muted-foreground"
+        className="shrink-0"
       />
       <span className="flex-1 truncate text-sm text-foreground">{agent}</span>
       <span
@@ -84,13 +84,18 @@ function NotificationRow({
       onClick={onClick}
       className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left transition-colors hover:bg-accent"
     >
-      <span className="flex w-4 shrink-0 items-center justify-center">
+      <AgentIcon agent={n.agent} size={16} className="shrink-0" />
+      <span className="min-w-0 flex-1 truncate text-sm text-foreground">
+        {n.agent}{" "}
+        <span className="text-muted-foreground">{NOTIF_LABEL[n.kind]}</span>
+      </span>
+      <span className="shrink-0 flex items-center justify-center w-5">
         {n.kind === "finished" ? (
           <TickCircle
             variant="Linear"
-            size={15}
+            size={13}
             color="currentColor"
-            className="text-muted-foreground shrink-0"
+            className="text-emerald-500 shrink-0"
           />
         ) : (
           <span
@@ -100,10 +105,6 @@ function NotificationRow({
             )}
           />
         )}
-      </span>
-      <span className="min-w-0 flex-1 truncate text-sm text-foreground">
-        {n.agent}{" "}
-        <span className="text-muted-foreground">{NOTIF_LABEL[n.kind]}</span>
       </span>
       <span className="shrink-0 text-[10px] tabular-nums text-muted-foreground">
         {relativeTime(n.at)}

@@ -11,7 +11,7 @@ export function AgentErrorFloating() {
   const [expanded, setExpanded] = useState(false);
   const [isNotchHovered, setIsNotchHovered] = useState(false);
   const [isCountdownHovered, setIsCountdownHovered] = useState(false);
-  
+
   // Total countdown duration in seconds
   const DURATION = 10;
   const [timeLeft, setTimeLeft] = useState(DURATION);
@@ -55,7 +55,7 @@ export function AgentErrorFloating() {
 
   if (!error) return null;
 
-  // SVG progress circle configuration
+  // @ajmalleonard SVG progress circle configuration
   const radius = 7.5;
   const strokeWidth = 1.5;
   const circumference = 2 * Math.PI * radius;
@@ -160,7 +160,7 @@ export function AgentErrorFloating() {
         <span className="truncate text-[11.5px] font-semibold tracking-tight text-destructive flex-1">
           {expanded ? "Something went wrong" : "Error occurred"}
         </span>
-        
+
         <div className="flex items-center shrink-0">
           <button
             type="button"
@@ -172,7 +172,7 @@ export function AgentErrorFloating() {
           </button>
         </div>
       </div>
-      
+
       {/* Expanded Details */}
       <AnimatePresence>
         {expanded && (
