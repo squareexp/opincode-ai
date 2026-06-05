@@ -66,14 +66,42 @@ export function deriveTitle(messages: UIMessage[]): string {
     if (m.role !== "user") continue;
     for (const p of m.parts) {
       if (p.type !== "text") continue;
-      const text = (p as { text: string }).text
+      const rawText = (p as { text: string }).text;
+      
+      const text = rawText
         .replace(/<terminal-context[\s\S]*?<\/terminal-context>\s*/g, "")
         .replace(/<selection[\s\S]*?<\/selection>\s*/g, "")
         .replace(/<file[\s\S]*?<\/file>\s*/g, "")
+        .replace(/<folder[\s\S]*?<\/folder>\s*/g, "")
+        .replace(/<snippet[\s\S]*?<\/snippet>\s*/g, "")
+        .replace(/<skill[\s\S]*?<\/skill>\s*/g, "")
         .trim();
-      if (!text) continue;
-      const first = text.split("\n")[0].trim();
-      return first.length > 40 ? `${first.slice(0, 40)}…` : first;
+      
+      if (text) {
+        const first = text.split("\n")[0].trim();
+        return first.length > 40 ? `${first.slice(0, 40)}…` : first;
+      }
+
+      // Fallback: if empty clean text, try to extract first resource tag name
+      const skillMatch = rawText.match(/<skill\s+name="([^"]+)"/);
+      if (skillMatch && skillMatch[1]) {
+        return skillMatch[1];
+      }
+
+      const cmdMatch = rawText.match(/<opincode-command\s+name="([^"]+)"/);
+      if (cmdMatch && cmdMatch[1]) {
+        return `/${cmdMatch[1]}`;
+      }
+
+      const folderMatch = rawText.match(/<folder\s+name="([^"]+)">/);
+      if (folderMatch && folderMatch[1]) {
+        return `${folderMatch[1]}/`;
+      }
+
+      const fileMatch = rawText.match(/<file\s+name="([^"]+)"/);
+      if (fileMatch && fileMatch[1]) {
+        return fileMatch[1];
+      }
     }
   }
   return "New chat";

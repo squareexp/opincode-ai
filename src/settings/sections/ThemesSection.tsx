@@ -188,10 +188,10 @@ export function ThemesSection() {
                 type="button"
                 onClick={() => setThemeId(t.id)}
                 className={cn(
-                  "group flex items-center gap-3 rounded-lg border p-2.5 text-left transition-all",
+                  "group flex items-center gap-3 rounded-2xl border p-2.5 text-left transition-all bg-card/25 backdrop-blur-md",
                   selected
                     ? "border-foreground/60 ring-1 ring-foreground/20"
-                    : "border-border/60 hover:border-border",
+                    : "border-border/40 hover:border-border/80",
                 )}
               >
                 <div
@@ -303,7 +303,7 @@ export function ThemesSection() {
           </div>
         ) : null}
         {backgroundKind === "image" && backgroundImageId ? (
-          <div className="flex flex-col gap-3 rounded-lg border border-border/60 p-3">
+          <div className="flex flex-col gap-3 rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md p-3">
             <div className="flex items-center justify-between gap-3">
               <span className="text-[11.5px] text-muted-foreground">
                 Opacity

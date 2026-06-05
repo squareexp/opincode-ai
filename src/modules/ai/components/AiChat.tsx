@@ -1,8 +1,9 @@
 import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowRight2 } from 'iconsax-react';
+import { SkillLeafIcon } from '../lib/icons';
 
 
-import {  CodeIcon, File01Icon, HashtagIcon, TerminalIcon  } from '@hugeicons/core-free-icons';
+import {  CodeIcon, File01Icon, FolderLibraryIcon, HashtagIcon, SparklesIcon, TerminalIcon  } from '@hugeicons/core-free-icons';
 import {
   Conversation,
   ConversationContent,
@@ -69,13 +70,17 @@ type AnyToolPart = ToolUIPart | DynamicToolUIPart;
 type ContextChip =
   | { kind: "selection"; source: "terminal" | "editor"; lines: number }
   | { kind: "file"; name: string; lines: number }
-  | { kind: "snippet"; name: string };
+  | { kind: "snippet"; name: string }
+  | { kind: "skill"; name: string; isScript?: boolean }
+  | { kind: "folder"; name: string; fileCount: number };
 
 const SELECTION_RE =
   /<selection\s+source="(terminal|editor)">\n?([\s\S]*?)\n?<\/selection>/g;
 const FILE_RE =
   /<file\s+name="([^"]+)"[^>]*>\n?([\s\S]*?)\n?<\/file>/g;
 const SNIPPET_RE = /<snippet\s+name="([^"]+)">\n?[\s\S]*?\n?<\/snippet>/g;
+const SKILL_RE = /<skill\s+name="([^"]+)"(?:\s+isScript="([^"]*)")?>\n?[\s\S]*?\n?<\/skill>/g;
+const FOLDER_RE = /<folder\s+name="([^"]+)">\n?([\s\S]*?)\n?<\/folder>/g;
 
 function countLines(s: string): number {
   if (!s) return 0;
@@ -90,6 +95,17 @@ function stripUserContextBlocks(text: string): {
 } {
   const chips: ContextChip[] = [];
   let out = text;
+  // Strip skill blocks first (they can contain <file> tags inside)
+  out = out.replace(SKILL_RE, (_m, name: string, isScriptStr?: string) => {
+    chips.push({ kind: "skill", name, isScript: isScriptStr === "true" });
+    return "";
+  });
+  out = out.replace(FOLDER_RE, (_m, name: string, body: string) => {
+    // Count files in the folder block (they're wrapped as <file> tags)
+    const fileMatches = body.match(/<file\s+name=/g);
+    chips.push({ kind: "folder", name, fileCount: fileMatches?.length ?? 0 });
+    return "";
+  });
   out = out.replace(SELECTION_RE, (_m, source: string, body: string) => {
     chips.push({
       kind: "selection",
@@ -115,19 +131,32 @@ const ContextChips = memo(function ContextChips({
   chips: ContextChip[];
 }) {
   return (
-    <div className="mb-1 flex flex-wrap gap-1">
-      {chips.map((c, i) => (
-        <span
-          key={i}
-          className="inline-flex items-center gap-1 rounded-md border border-border/50 bg-card/60 px-1.5 py-0.5 text-[10.5px] text-muted-foreground"
-        >
-          {chipIcon(c)}
-          <span className="font-medium text-foreground">{chipLabel(c)}</span>
-          {"lines" in c && c.lines > 0 ? (
-            <span className="opacity-70">· {c.lines}L</span>
-          ) : null}
-        </span>
-      ))}
+    <div className="mb-1 flex flex-wrap items-center gap-1.5">
+      {chips.map((c, i) => {
+        if (c.kind === "skill") {
+          return (
+            <span
+              key={i}
+              className="inline-flex items-center gap-0.5 text-[11px] font-medium text-blue-600 dark:text-blue-400 capitalize"
+            >
+              {chipIcon(c)}
+              <span>{chipLabel(c)}</span>
+            </span>
+          );
+        }
+        return (
+          <span
+            key={i}
+            className="inline-flex items-center gap-1 rounded-md border border-border/50 bg-card/60 px-1.5 py-0.5 text-[10.5px] text-muted-foreground"
+          >
+            {chipIcon(c)}
+            <span className="font-medium text-foreground">{chipLabel(c)}</span>
+            {chipMeta(c) ? (
+              <span className="opacity-70">· {chipMeta(c)}</span>
+            ) : null}
+          </span>
+        );
+      })}
     </div>
   );
 });
@@ -145,6 +174,20 @@ function chipIcon(c: ContextChip) {
   if (c.kind === "file") {
     return <HugeiconsIcon icon={File01Icon} strokeWidth={1.75} size={10} />;
   }
+  if (c.kind === "skill") {
+    if (c.isScript) {
+      return <HugeiconsIcon icon={SparklesIcon} strokeWidth={1.75} size={10} />;
+    }
+    return (
+      <SkillLeafIcon
+        color="currentColor"
+        className="h-2.5 w-[7.7px] shrink-0"
+      />
+    );
+  }
+  if (c.kind === "folder") {
+    return <HugeiconsIcon icon={FolderLibraryIcon} strokeWidth={1.75} size={10} />;
+  }
   return <HugeiconsIcon icon={HashtagIcon} strokeWidth={1.75} size={10} />;
 }
 
@@ -153,7 +196,16 @@ function chipLabel(c: ContextChip): string {
     return c.source === "editor" ? "Editor selection" : "Terminal selection";
   }
   if (c.kind === "file") return c.name;
+  if (c.kind === "skill") return c.name;
+  if (c.kind === "folder") return `${c.name}/`;
   return `#${c.name}`;
+}
+
+function chipMeta(c: ContextChip): string | null {
+  if (c.kind === "file" && "lines" in c && c.lines > 0) return `${c.lines}L`;
+  if (c.kind === "folder" && c.fileCount > 0) return `${c.fileCount} files`;
+  if (c.kind === "selection" && "lines" in c && c.lines > 0) return `${c.lines}L`;
+  return null;
 }
 type AnyPart = UIMessagePart<Record<string, never>, Record<string, never>>;
 

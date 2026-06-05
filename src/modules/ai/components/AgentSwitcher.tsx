@@ -1,8 +1,7 @@
 
-import { ArrowDown2, Setting2, TickCircle } from 'iconsax-react';
+import { ArrowDown2, Setting, TickCircle } from 'iconsax-react';
 import { Button } from "@/components/ui/button";
 
-import { AbsoluteIcon, CodeIcon, PaintBrush04Icon, PencilEdit02Icon, ShieldUserIcon, SparklesIcon } from '@hugeicons/core-free-icons';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,18 +11,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { openSettingsWindow } from "@/modules/settings/openSettingsWindow";
-import type { AgentIconId } from "../lib/agents";
 import { useAgentsStore } from "../store/agentsStore";
 import { AgentIcon } from "@/modules/agents/lib/agentIcon";
 
-const ICONS: Record<AgentIconId, typeof CodeIcon> = {
-  coder: CodeIcon,
-  architect: AbsoluteIcon,
-  reviewer: PencilEdit02Icon,
-  security: ShieldUserIcon,
-  designer: PaintBrush04Icon,
-  spark: SparklesIcon,
-};
+const ICONS = {} as any;
 
 export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
   // Subscribe to customAgents + activeId so the trigger updates live.
@@ -47,7 +38,7 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
           variant="secondary"
           className={cn(
             !isMiniWindow
-              ? "flex h-6 items-center   gap-1 rounded-full border border-border/60 bg-card p-4 text-[10.5px] text-muted-foreground transition-colors hover:border-border hover:bg-accent hover:text-foreground"
+              ? "flex h-5.5 items-center gap-1 rounded-full border border-border/60 bg-card px-2 text-[9.5px] font-medium text-muted-foreground transition-colors hover:border-border hover:bg-accent hover:text-foreground select-none"
               : "text-xs mr-1",
           )}
           title={`Agent: ${active.name}`}
@@ -67,9 +58,9 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
           />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="min-w-60">
+      <DropdownMenuContent align="start" className="min-w-80 rounded-3XL">
         <div className="px-2 pt-1.5 pb-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-          Built-in
+          Experts
         </div>
         {builtIn.map((a) => {
           return (
@@ -77,11 +68,11 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
               key={a.id}
               onSelect={() => setActiveId(a.id)}
               className={cn(
-                "flex items-start gap-2 pr-2 text-[12px]",
+                "flex items-center gap-2 pr-2 text-[12px]",
                 a.id === activeId && "bg-accent/40",
               )}
             >
-              <AgentIcon agent={a.name} size={14} className="mt-0.5 shrink-0" />
+              <AgentIcon agent={a.name} size={20} className="mt-0.5 shrink-0" />
               <span className="flex min-w-0 flex-1 flex-col">
                 <span>{a.name}</span>
                 <span className="line-clamp-1 text-[10.5px] text-muted-foreground">
@@ -111,13 +102,13 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
                   key={a.id}
                   onSelect={() => setActiveId(a.id)}
                   className={cn(
-                    "flex items-start gap-2 text-[12px]",
+                    "flex items-center gap-2 text-[12px]",
                     a.id === activeId && "bg-accent/40",
                   )}
                 >
                   <AgentIcon
                     agent={a.name}
-                    size={14}
+                    size={20}
                     className="mt-0.5 shrink-0"
                   />
                   <span className="flex min-w-0 flex-1 flex-col">
@@ -146,7 +137,7 @@ export function AgentSwitcher({ isMiniWindow }: { isMiniWindow?: boolean }) {
           onSelect={() => void openSettingsWindow("agents")}
           className="gap-2 text-[12px] text-muted-foreground"
         >
-          <Setting2 variant="Linear" size={12} color="currentColor" />
+          <Setting variant="Linear" size={12} color="currentColor" />
           Manage agents…
         </DropdownMenuItem>
       </DropdownMenuContent>

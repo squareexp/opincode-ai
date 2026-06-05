@@ -252,6 +252,14 @@ textarea,
   user-select: text;
 }
 
+[data-rich-input][data-empty="true"]::before {
+  content: attr(data-placeholder);
+  color: var(--muted-foreground);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+
 .cm-color-swatch {
   display: inline-block;
   width: 0.85em;

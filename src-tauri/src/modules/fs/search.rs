@@ -196,16 +196,20 @@ pub fn fs_list_files(
             break;
         }
         let is_file = dent.file_type().map(|t| t.is_file()).unwrap_or(false);
-        if !is_file {
+        let is_dir = dent.file_type().map(|t| t.is_dir()).unwrap_or(false);
+        if !is_file && !is_dir {
             continue;
         }
         let path = dent.path();
-        let rel = match path.strip_prefix(&root_path) {
+        let mut rel = match path.strip_prefix(&root_path) {
             Ok(r) => to_canon(r),
             Err(_) => continue,
         };
         if rel.is_empty() {
             continue;
+        }
+        if is_dir {
+            rel = format!("{rel}/");
         }
         files.push(rel);
         if files.len() >= cap {

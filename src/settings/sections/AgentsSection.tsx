@@ -2,7 +2,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { Edit2 } from 'iconsax-react';
 import { Button } from "@/components/ui/button";
 
-import { Add01Icon, CheckmarkCircle02Icon, Delete02Icon, SparklesIcon } from '@hugeicons/core-free-icons';
+import { Add01Icon, CheckmarkCircle02Icon, Delete02Icon } from '@hugeicons/core-free-icons';
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { AGENT_ICONS } from "@/modules/ai/components/AgentSwitcher";
 import { AgentIcon } from "@/modules/agents/lib/agentIcon";
 import {
   BUILTIN_AGENTS,
@@ -36,12 +35,11 @@ import { useEffect, useRef, useState } from "react";
 import { SectionHeader } from "../components/SectionHeader";
 
 const ICON_OPTIONS: AgentIconId[] = [
-  "coder",
-  "architect",
-  "reviewer",
-  "security",
-  "designer",
-  "spark",
+  "opin",
+  "monkin",
+  "rob",
+  "supricon",
+  "diom",
 ];
 
 export function AgentsSection() {
@@ -88,7 +86,7 @@ export function AgentsSection() {
                 name: "New agent",
                 description: "",
                 instructions: "",
-                icon: "spark",
+                icon: "opin",
                 builtIn: false,
               })
             }
@@ -143,7 +141,7 @@ export function AgentsSection() {
         </div>
 
         {snippets.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border/60 bg-card/30 px-4 py-6 text-center text-[11px] text-muted-foreground">
+          <div className="rounded-2xl border border-dashed border-border/40 bg-card/25 backdrop-blur-md px-4 py-6 text-center text-[11px] text-muted-foreground">
             No snippets yet. Create one and insert it with{" "}
             <code className="font-mono">#handle</code> in the AI input.
           </div>
@@ -152,7 +150,7 @@ export function AgentsSection() {
             {snippets.map((s) => (
               <li
                 key={s.id}
-                className="flex items-center gap-2 rounded-lg border border-border/60 bg-card/60 px-3 py-2"
+                className="flex items-center gap-2 rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md px-3 py-2"
               >
                 <code className="rounded bg-muted/50 px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground">
                   #{s.handle}
@@ -233,10 +231,10 @@ function AgentCard({
   return (
     <div
       className={cn(
-        "group relative flex flex-col gap-1.5 rounded-lg border bg-card/60 px-3 py-2.5 transition-colors",
+        "group relative flex flex-col gap-1.5 rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md px-3 py-2.5 transition-colors",
         active
           ? "border-foreground/30 ring-1 ring-foreground/10"
-          : "border-border/60 hover:border-border",
+          : "border-border/40 hover:border-border/80",
       )}
     >
       <div className="flex items-start gap-2">
@@ -335,7 +333,6 @@ function AgentEditorDialog({
               <Label>Icon</Label>
               <div className="flex flex-wrap gap-1">
                 {ICON_OPTIONS.map((id) => {
-                  const Icon = AGENT_ICONS[id] ?? SparklesIcon;
                   const active = draft.icon === id;
                   return (
                     <button
@@ -349,7 +346,7 @@ function AgentEditorDialog({
                           : "border-border/60 hover:bg-accent/40",
                       )}
                     >
-                      <HugeiconsIcon icon={Icon} strokeWidth={1.75}  size={13} />
+                      <AgentIcon agent={id} size={14} showBg={false} />
                     </button>
                   );
                 })}

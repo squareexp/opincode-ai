@@ -111,7 +111,7 @@ export function ShortcutsSection() {
               <h3 className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                 {group}
               </h3>
-              <div className="flex flex-col divide-y divide-border/40 rounded-lg border border-border/60 bg-card/40 overflow-hidden">
+              <div className="flex flex-col divide-y divide-border/40 rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md overflow-hidden">
                 {items.map((s) => (
                   <ShortcutRow
                     key={s.id}

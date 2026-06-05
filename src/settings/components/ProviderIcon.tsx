@@ -10,6 +10,26 @@ type Props = {
 };
 
 export function ProviderIcon({ provider, size = 14, className }: Props) {
+  if (provider === "z.ai") {
+    return (
+      <img
+        src="/zai.svg"
+        alt="Z.AI"
+        style={{ width: size, height: size }}
+        className={cn("dark:invert shrink-0 object-contain", className)}
+      />
+    );
+  }
+  if (provider === "moonshot") {
+    return (
+      <img
+        src="/moonshot.svg"
+        alt="Moonshot"
+        style={{ width: size, height: size }}
+        className={cn("dark:invert shrink-0 object-contain", className)}
+      />
+    );
+  }
   if (provider === "google") {
     return (
       <img

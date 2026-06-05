@@ -16,6 +16,8 @@ export const EMPTY_PROVIDER_KEYS: ProviderKeys = {
   deepseek: null,
   xiaomi: null,
   ollama: null,
+  "z.ai": null,
+  moonshot: null,
 };
 
 export async function getKey(provider: ProviderId): Promise<string | null> {

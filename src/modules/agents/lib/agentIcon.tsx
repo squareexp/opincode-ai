@@ -1,12 +1,4 @@
 import { HugeiconsIcon } from '@hugeicons/react';
-import {
-  AbsoluteIcon,
-  CodeIcon,
-  PaintBrush04Icon,
-  PencilEdit02Icon,
-  ShieldUserIcon,
-  RoboticIcon,
-} from '@hugeicons/core-free-icons';
 import { cn } from "@/lib/utils";
 
 export type AgentStyleInfo = {
@@ -18,46 +10,39 @@ export type AgentStyleInfo = {
 export function getAgentStyle(agentName: string): AgentStyleInfo {
   const name = agentName.toLowerCase();
   
-  if (name.includes("coder") || name.includes("developer") || name.includes("engineer")) {
+  if (name.includes("opin") || name.includes("coder") || name.includes("developer") || name.includes("engineer")) {
     return {
-      icon: CodeIcon,
-      colorClass: "bg-blue-500/10 text-blue-500 border-blue-500/15 dark:bg-blue-400/10 dark:text-blue-400 dark:border-blue-400/15",
-      label: "Coder",
-    };
-  }
-  if (name.includes("architect") || name.includes("planner")) {
-    return {
-      icon: AbsoluteIcon,
-      colorClass: "bg-purple-500/10 text-purple-500 border-purple-500/15 dark:bg-purple-400/10 dark:text-purple-400 dark:border-purple-400/15",
-      label: "Architect",
-    };
-  }
-  if (name.includes("reviewer") || name.includes("audit") || name.includes("review")) {
-    return {
-      icon: PencilEdit02Icon,
-      colorClass: "bg-amber-500/10 text-amber-500 border-amber-500/15 dark:bg-amber-400/10 dark:text-amber-400 dark:border-amber-400/15",
-      label: "Code Reviewer",
-    };
-  }
-  if (name.includes("security") || name.includes("guard") || name.includes("vuln")) {
-    return {
-      icon: ShieldUserIcon,
-      colorClass: "bg-emerald-500/10 text-emerald-500 border-emerald-500/15 dark:bg-emerald-400/10 dark:text-emerald-400 dark:border-emerald-400/15",
-      label: "Security",
-    };
-  }
-  if (name.includes("designer") || name.includes("ui") || name.includes("ux") || name.includes("style")) {
-    return {
-      icon: PaintBrush04Icon,
-      colorClass: "bg-rose-500/10 text-rose-500 border-rose-500/15 dark:bg-rose-400/10 dark:text-rose-400 dark:border-rose-400/15",
-      label: "Designer",
-    };
-  }
-  if (name.includes("opincode") || name.includes("opin")) {
-    return {
-      icon: "logo",
+      icon: "/agents/Opin.svg",
       colorClass: "bg-indigo-500/10 text-indigo-500 border-indigo-500/15 dark:bg-indigo-400/10 dark:text-indigo-400 dark:border-indigo-400/15",
-      label: "OpinCode",
+      label: "Opin",
+    };
+  }
+  if (name.includes("monkin") || name.includes("architect") || name.includes("planner")) {
+    return {
+      icon: "/agents/Monkin.svg",
+      colorClass: "bg-purple-500/10 text-purple-500 border-purple-500/15 dark:bg-purple-400/10 dark:text-purple-400 dark:border-purple-400/15",
+      label: "Monkin",
+    };
+  }
+  if (name.includes("rob") || name.includes("reviewer") || name.includes("audit") || name.includes("review")) {
+    return {
+      icon: "/agents/Rob.svg",
+      colorClass: "bg-amber-500/10 text-amber-500 border-amber-500/15 dark:bg-amber-400/10 dark:text-amber-400 dark:border-amber-400/15",
+      label: "Rob",
+    };
+  }
+  if (name.includes("supricon") || name.includes("security") || name.includes("guard") || name.includes("vuln")) {
+    return {
+      icon: "/agents/Supricon.svg",
+      colorClass: "bg-emerald-500/10 text-emerald-500 border-emerald-500/15 dark:bg-emerald-400/10 dark:text-emerald-400 dark:border-emerald-400/15",
+      label: "Supricon",
+    };
+  }
+  if (name.includes("diom") || name.includes("designer") || name.includes("ui") || name.includes("ux") || name.includes("style")) {
+    return {
+      icon: "/agents/Diom.svg",
+      colorClass: "bg-rose-500/10 text-rose-500 border-rose-500/15 dark:bg-rose-400/10 dark:text-rose-400 dark:border-rose-400/15",
+      label: "Diom",
     };
   }
   if (name.includes("claude") || name.includes("anthropic")) {
@@ -104,7 +89,7 @@ export function getAgentStyle(agentName: string): AgentStyleInfo {
   }
   // Default fallback
   return {
-    icon: RoboticIcon,
+    icon: "/agents/Opin.svg",
     colorClass: "bg-slate-500/10 text-slate-500 border-slate-500/15 dark:bg-slate-400/10 dark:text-slate-400 dark:border-slate-400/15",
     label: agentName,
   };
@@ -114,7 +99,7 @@ export function AgentIcon({
   agent,
   size = 15,
   className,
-  showBg = true,
+  showBg = false,
 }: {
   agent: string;
   size?: number;
@@ -125,6 +110,16 @@ export function AgentIcon({
   const { icon, colorClass } = styleInfo;
 
   const renderIcon = () => {
+    if (typeof icon === "string" && (icon.startsWith("/") || icon.endsWith(".svg"))) {
+      return (
+        <img
+          src={icon}
+          alt=""
+          style={{ width: size, height: size }}
+          className="dark:invert shrink-0 object-contain"
+        />
+      );
+    }
     if (icon === "logo") {
       return (
         <img
@@ -132,7 +127,7 @@ export function AgentIcon({
           alt=""
           width={size}
           height={size}
-          className="shrink-0 object-contain"
+          className=" shrink-0 object-contain"
         />
       );
     }

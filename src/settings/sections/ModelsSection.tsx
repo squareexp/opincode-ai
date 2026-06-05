@@ -118,7 +118,6 @@ export function ModelsSection() {
   const visibleIds = new Set<ProviderId>(configuredIds);
   for (const id of adding) visibleIds.add(id);
   const visibleProviders = PROVIDERS.filter((p) => visibleIds.has(p.id));
-  const addableProviders = PROVIDERS.filter((p) => !visibleIds.has(p.id));
 
   const removeProvider = (id: ProviderId) => {
     if (isLocalProvider(id)) {
@@ -138,6 +137,20 @@ export function ModelsSection() {
 
   const addProvider = (id: ProviderId) => {
     setAdding((prev) => new Set(prev).add(id));
+    setTimeout(() => {
+      const el = document.getElementById(`provider-card-${id}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("ring-1", "ring-primary/50");
+        setTimeout(() => {
+          el.classList.remove("ring-1", "ring-primary/50");
+        }, 1500);
+        const input = el.querySelector("input");
+        if (input) {
+          input.focus();
+        }
+      }
+    }, 100);
   };
 
   return (
@@ -157,13 +170,15 @@ export function ModelsSection() {
         <div className="flex items-center justify-between">
           <Label>Providers</Label>
           <AddProviderMenu
-            providers={addableProviders}
+            providers={PROVIDERS}
+            configuredIds={configuredIds}
+            visibleIds={visibleIds}
             onAdd={addProvider}
           />
         </div>
 
         {visibleProviders.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border/60 bg-card/40 px-4 py-8 text-center">
+          <div className="rounded-2xl border border-dashed border-border/40 bg-card/25 backdrop-blur-md px-4 py-8 text-center">
             <p className="text-[12px] text-muted-foreground">
               No providers connected yet.
             </p>
@@ -210,14 +225,17 @@ type LocalConfig = {
 
 function AddProviderMenu({
   providers,
+  configuredIds,
+  visibleIds,
   onAdd,
 }: {
   providers: readonly ProviderInfo[];
+  configuredIds: Set<ProviderId>;
+  visibleIds: Set<ProviderId>;
   onAdd: (id: ProviderId) => void;
 }) {
   const cloud = providers.filter((p) => !isLocalProvider(p.id));
   const local = providers.filter((p) => isLocalProvider(p.id));
-  const disabled = providers.length === 0;
 
   return (
     <DropdownMenu>
@@ -225,7 +243,6 @@ function AddProviderMenu({
         <Button
           size="sm"
           variant="outline"
-          disabled={disabled}
           className="h-7 gap-1.5 px-2.5 text-[11px]"
         >
           <HugeiconsIcon icon={Add01Icon} strokeWidth={1.75} size={12} />
@@ -239,7 +256,13 @@ function AddProviderMenu({
               Cloud
             </DropdownMenuLabel>
             {cloud.map((p) => (
-              <ProviderMenuItem key={p.id} provider={p} onAdd={onAdd} />
+              <ProviderMenuItem
+                key={p.id}
+                provider={p}
+                isConfigured={configuredIds.has(p.id)}
+                isVisible={visibleIds.has(p.id)}
+                onAdd={onAdd}
+              />
             ))}
           </>
         ) : null}
@@ -249,7 +272,13 @@ function AddProviderMenu({
               Local & custom
             </DropdownMenuLabel>
             {local.map((p) => (
-              <ProviderMenuItem key={p.id} provider={p} onAdd={onAdd} />
+              <ProviderMenuItem
+                key={p.id}
+                provider={p}
+                isConfigured={configuredIds.has(p.id)}
+                isVisible={visibleIds.has(p.id)}
+                onAdd={onAdd}
+              />
             ))}
           </>
         ) : null}
@@ -260,18 +289,29 @@ function AddProviderMenu({
 
 function ProviderMenuItem({
   provider,
+  isConfigured,
+  isVisible,
   onAdd,
 }: {
   provider: ProviderInfo;
+  isConfigured: boolean;
+  isVisible: boolean;
   onAdd: (id: ProviderId) => void;
 }) {
   return (
     <DropdownMenuItem
       onSelect={() => onAdd(provider.id)}
-      className="flex items-center gap-2 text-[12px]"
+      className="flex items-center justify-between text-[12px]"
     >
-      <ProviderIcon provider={provider.id} size={13} />
-      <span>{provider.label}</span>
+      <span className="flex items-center gap-2">
+        <ProviderIcon provider={provider.id} size={13} />
+        <span>{provider.label}</span>
+      </span>
+      {isConfigured ? (
+        <span className="text-[9.5px] text-muted-foreground/70">Connected</span>
+      ) : isVisible ? (
+        <span className="text-[9.5px] text-muted-foreground/70">Added</span>
+      ) : null}
     </DropdownMenuItem>
   );
 }
@@ -288,7 +328,7 @@ function DefaultsBlock({
   return (
     <div className="flex flex-col gap-3">
       <Label>Defaults</Label>
-      <div className="flex flex-col gap-2.5 rounded-lg border border-border/60 bg-card/60 px-3 py-2.5">
+      <div className="flex flex-col gap-2.5 rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md px-3 py-2.5">
         <FieldRow label="Chat model">
           <DefaultModelPicker
             defaultModel={defaultModel}
@@ -545,7 +585,7 @@ function LocalProviderCard({
   };
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card/60 px-3 py-2.5">
+    <div id={`provider-card-${provider.id}`} className="flex flex-col gap-2 rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md px-3 py-2.5">
       <div className="flex items-center gap-2">
         <ProviderIcon provider={provider.id} size={15} />
         <span className="text-[12.5px] font-medium">{provider.label}</span>

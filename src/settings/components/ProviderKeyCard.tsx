@@ -66,7 +66,7 @@ export function ProviderKeyCard({
   };
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card/60 px-3 py-2.5">
+    <div id={`provider-card-${provider.id}`} className="flex flex-col gap-2 rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md px-3 py-2.5">
       <div className="flex items-center gap-2">
         <ProviderIcon provider={provider.id} size={15} />
         <span className="text-[12.5px] font-medium">{provider.label}</span>

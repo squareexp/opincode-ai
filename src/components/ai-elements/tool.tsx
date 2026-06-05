@@ -28,6 +28,7 @@ import { useChatStore } from "@/modules/ai/store/chatStore";
 import type { DynamicToolUIPart, ToolUIPart } from "ai";
 import type { ComponentProps, ReactNode } from "react";
 import { isValidElement, memo, useState } from "react";
+import { AgentIcon, getAgentStyle } from "@/modules/agents/lib/agentIcon";
 
 
 export type ToolPart = ToolUIPart | DynamicToolUIPart;
@@ -101,7 +102,7 @@ function deriveSummary(toolName: string, input: unknown): string | null {
     case "open_preview":
       return str("path") ?? str("url");
     case "run_subagent":
-      return str("agent") ?? str("task");
+      return str("description") ?? str("prompt") ?? null;
     case "todo_write": {
       const items = Array.isArray(i.todos) ? i.todos : null;
       return items
@@ -134,6 +135,21 @@ const HEAVY_CONTENT_TOOLS = new Set([
   "todo_write",
 ]);
 
+function getSubagentName(type: string): string {
+  switch (type) {
+    case "explore":
+      return "Opin";
+    case "code-review":
+      return "Rob";
+    case "security":
+      return "Supricon";
+    case "general":
+      return "Monkin";
+    default:
+      return "Opin";
+  }
+}
+
 const ToolImpl = ({
   className,
   toolName,
@@ -144,13 +160,42 @@ const ToolImpl = ({
   defaultOpen,
   ...props
 }: ToolProps) => {
-  const meta = TOOL_META[toolName];
-  const Icon = meta?.icon ?? Category;
-  const label = meta?.label ?? toolName;
   const summary = deriveSummary(toolName, input);
   const isError = state === "output-error";
   const open = defaultOpen ?? isError;
   const isHeavy = HEAVY_CONTENT_TOOLS.has(toolName);
+  
+  const meta = TOOL_META[toolName];
+  let label = meta?.label ?? toolName;
+  let customIcon: ReactNode = null;
+  let labelColorClass = "";
+
+  if (toolName === "run_subagent" && input && typeof input === "object") {
+    const type = (input as any).type || "general";
+    const agentName = getSubagentName(type);
+    label = agentName;
+    customIcon = (
+      <AgentIcon
+        agent={agentName}
+        size={11}
+        showBg={false}
+        className="shrink-0"
+      />
+    );
+    const styleInfo = getAgentStyle(agentName);
+    const textColors = styleInfo.colorClass.split(" ").filter(c => c.includes("text-"));
+    labelColorClass = textColors.join(" ");
+  } else {
+    const Icon = meta?.icon ?? Category;
+    customIcon = (
+      <Icon
+        variant="Linear"
+        size={13}
+        color="currentColor"
+        className="shrink-0 text-muted-foreground"
+      />
+    );
+  }
   // For heavy tools, only show details on error — never the streamed input
   // body, which is huge and re-renders per token.
   const showInputBody = !isHeavy && Boolean(input);
@@ -177,13 +222,8 @@ const ToolImpl = ({
           className={cn("size-1.5 shrink-0 rounded-full", STATUS_DOT[state])}
           aria-label={STATUS_LABEL[state]}
         />
-        <Icon
-          variant="Linear"
-          size={13}
-          color="currentColor"
-          className="shrink-0 text-muted-foreground"
-        />
-        <span className="shrink-0 font-medium text-foreground">{label}</span>
+        {customIcon}
+        <span className={cn("shrink-0 font-medium", labelColorClass || "text-foreground")}>{label}</span>
         {summary ? (
           <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-muted-foreground">
             {summary}

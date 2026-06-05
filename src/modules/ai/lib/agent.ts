@@ -135,6 +135,26 @@ export async function buildLanguageModel(
       })(resolvedModelId);
       break;
     }
+    case "z.ai": {
+      const { createOpenAICompatible } =
+        await import("@ai-sdk/openai-compatible");
+      built = createOpenAICompatible({
+        name: "z.ai",
+        baseURL: "https://api.z.ai/api/paas/v4",
+        apiKey: key,
+      })(resolvedModelId);
+      break;
+    }
+    case "moonshot": {
+      const { createOpenAICompatible } =
+        await import("@ai-sdk/openai-compatible");
+      built = createOpenAICompatible({
+        name: "moonshot",
+        baseURL: "https://api.moonshot.ai/v1",
+        apiKey: key,
+      })(resolvedModelId);
+      break;
+    }
     default: {
       const _exhaustive: never = provider;
       throw new Error(`Unsupported provider: ${_exhaustive as ProviderId}`);

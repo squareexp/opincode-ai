@@ -2,7 +2,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowDown2, SearchNormal1, Setting2 } from 'iconsax-react';
 import { Button } from "@/components/ui/button";
 
-import { Add01Icon, AiBookIcon, ArrowUpIcon, BrainIcon, Clock01Icon, CoinsDollarIcon, FavouriteIcon, FlashIcon, Message01Icon, Mic01Icon, StarIcon, StopCircleIcon, Tick01Icon } from '@hugeicons/core-free-icons';
+import { AiBookIcon, BrainIcon, Clock01Icon, CoinsDollarIcon, FavouriteIcon, FlashIcon, Message01Icon, StarIcon, Tick01Icon } from '@hugeicons/core-free-icons';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Kbd } from "@/components/ui/kbd";
-import { Spinner } from "@/components/ui/spinner";
 import { fmtShortcut, MOD_KEY } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 import { openSettingsWindow } from "@/modules/settings/openSettingsWindow";
@@ -26,11 +25,9 @@ import {
   type ModelInfo,
   type ProviderId,
 } from "../config";
-import { ACCEPTED_FILES, useComposer } from "../lib/composer";
 import { toggleFavoriteModel } from "../lib/modelPrefs";
 import { useChatStore } from "../store/chatStore";
 import { usePreferencesStore } from "@/modules/settings/preferences";
-import { setYoloMode } from "@/modules/settings/store";
 import { ProviderIcon } from "@/settings/components/ProviderIcon";
 
 export function AiOpenButton({ onOpen }: { onOpen: () => void }) {
@@ -53,68 +50,13 @@ export function AiOpenButton({ onOpen }: { onOpen: () => void }) {
 }
 
 export function AiStatusBarControls() {
-  const c = useComposer();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const openMini = useChatStore((s) => s.openMini);
   const miniOpen = useChatStore((s) => s.mini.open);
   const closePanel = useChatStore((s) => s.closePanel);
 
   return (
     <div className="flex items-center gap-0.5">
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        accept={ACCEPTED_FILES}
-        className="hidden"
-        onChange={(e) => {
-          void c.addFiles(e.target.files);
-          e.target.value = "";
-        }}
-      />
-
-      <IconBtn
-        title="Attach file or image"
-        onClick={() => fileInputRef.current?.click()}
-        disabled={c.isBusy}
-      >
-        <HugeiconsIcon icon={Add01Icon} strokeWidth={1.75} size={13} />
-      </IconBtn>
-
-      {c.voice.supported && (
-        <IconBtn
-          title={
-            !c.voice.hasKey
-              ? "Voice needs an OpenAI key"
-              : c.voice.recording
-                ? "Stop & transcribe"
-                : c.voice.transcribing
-                  ? "Transcribing…"
-                  : "Voice input"
-          }
-          onClick={() =>
-            c.voice.recording ? c.voice.stop() : void c.voice.start()
-          }
-          disabled={c.isBusy || c.voice.transcribing || !c.voice.hasKey}
-          className={cn(
-            c.voice.recording &&
-            "bg-destructive/10 text-destructive hover:bg-destructive/15",
-          )}
-        >
-          {c.voice.recording ? (
-            <span className="size-2 animate-pulse rounded-full bg-destructive" />
-          ) : c.voice.transcribing ? (
-            <Spinner className="size-3" />
-          ) : (
-            <HugeiconsIcon icon={Mic01Icon} strokeWidth={1.75} size={13} />
-          )}
-        </IconBtn>
-      )}
-
       <ModelDropdown />
-
-      {/* YOLO mode toggle */}
-      <YoloToggle />
 
       <span className="mx-1 h-8 w-px bg-border" aria-hidden />
       <Button
@@ -136,32 +78,6 @@ export function AiStatusBarControls() {
       >
         <HugeiconsIcon icon={Message01Icon} strokeWidth={1.75} size={13} />
       </IconBtn>
-
-      {c.isBusy ? (
-        <Button
-          type="button"
-          size="icon"
-          variant="ghost"
-          onClick={c.stop}
-          className="size-6"
-          aria-label="Stop"
-          title="Stop"
-        >
-          <HugeiconsIcon icon={StopCircleIcon} strokeWidth={1.75} size={13} />
-        </Button>
-      ) : (
-        <Button
-          type="button"
-          size="icon"
-          onClick={c.submit}
-          disabled={!c.canSend}
-          className="h-5.5 w-7.5 ml-1"
-          aria-label="Send"
-          title="Send (Enter)"
-        >
-          <HugeiconsIcon icon={ArrowUpIcon} strokeWidth={1.75} size={13} />
-        </Button>
-      )}
     </div>
   );
 }
@@ -609,34 +525,6 @@ function CapBar({
         ))}
       </span>
     </span>
-  );
-}
-
-function YoloToggle() {
-  const yoloMode = usePreferencesStore((s) => s.yoloMode);
-  return (
-    <button
-      type="button"
-      id="yolo-mode-toggle"
-      title={
-        yoloMode
-          ? "YOLO mode ON — all tool approvals are auto-accepted. Click to disable."
-          : "YOLO mode — auto-approve all AI tool calls without prompts"
-      }
-      onClick={() => void setYoloMode(!yoloMode)}
-      className={cn(
-        "relative flex h-6 items-center gap-1 rounded-full border px-1.5 text-[10.5px] font-medium transition-all",
-        yoloMode
-          ? "border-green-500/60 bg-green-500/10 text-green-500 hover:bg-green-500/20"
-          : "border-border/60 bg-transparent text-muted-foreground hover:border-border hover:bg-accent hover:text-foreground",
-      )}
-    >
-      {yoloMode && (
-        <span className="absolute inset-0 rounded-full ring-1 ring-green-500/40 animate-pulse pointer-events-none" />
-      )}
-      <HugeiconsIcon icon={FlashIcon} strokeWidth={1.75} size={11} />
-      YOLO
-    </button>
   );
 }
 

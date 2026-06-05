@@ -68,6 +68,7 @@ const loaders: Record<string, LanguageLoader> = {
 
   md: () => import("@codemirror/lang-markdown").then((m) => m.markdown()),
   markdown: () => import("@codemirror/lang-markdown").then((m) => m.markdown()),
+  mdx: () => import("@codemirror/lang-markdown").then((m) => m.markdown()),
 
   html: () => import("@codemirror/lang-html").then((m) => m.html()),
   htm: () => import("@codemirror/lang-html").then((m) => m.html()),
@@ -106,6 +107,8 @@ const loaders: Record<string, LanguageLoader> = {
     import("@codemirror/legacy-modes/mode/dockerfile").then(
       (m) => m.dockerFile,
     ),
+  swift: () =>
+    import("@codemirror/legacy-modes/mode/swift").then((m) => m.swift),
 };
 
 const filenameOverrides: Record<string, LanguageLoader> = {

@@ -6,7 +6,9 @@ export type ProviderId =
   | "google"
   | "deepseek"
   | "xiaomi"
-  | "ollama";
+  | "ollama"
+  | "z.ai"
+  | "moonshot";
 
 export type ProviderInfo = {
   id: ProviderId;
@@ -53,6 +55,20 @@ export const PROVIDERS: readonly ProviderInfo[] = [
     keyringAccount: "xiaomi-api-key",
     keyPrefix: null,
     consoleUrl: "https://platform.xiaomimimo.com/",
+  },
+  {
+    id: "z.ai",
+    label: "Z.AI",
+    keyringAccount: "z.ai-api-key",
+    keyPrefix: null,
+    consoleUrl: "https://z.ai/",
+  },
+  {
+    id: "moonshot",
+    label: "Moonshot AI",
+    keyringAccount: "moonshot-api-key",
+    keyPrefix: "sk-",
+    consoleUrl: "https://platform.moonshot.ai/",
   },
   {
     id: "ollama",
@@ -299,6 +315,64 @@ export const MODELS = [
     description: "Multimodal omni model for text and media tasks.",
     capabilities: { intelligence: 4, speed: 4, cost: 3 },
     tags: ["vision", "tools", "coding"],
+  },
+
+  // ── Z.AI ───────────────────────────────────────────────────────────────────
+  {
+    id: "glm-5.1",
+    provider: "z.ai",
+    label: "GLM 5.1",
+    hint: "Flagship",
+    description: "Z.AI flagship model optimized for reasoning and coding.",
+    capabilities: { intelligence: 5, speed: 3, cost: 3 },
+    tags: ["reasoning", "tools", "coding"],
+  },
+  {
+    id: "glm-5",
+    provider: "z.ai",
+    label: "GLM 5",
+    hint: "Balanced",
+    description: "Z.AI balanced model for general tasks.",
+    capabilities: { intelligence: 4, speed: 4, cost: 4 },
+    tags: ["tools"],
+  },
+  {
+    id: "glm-4-flash",
+    provider: "z.ai",
+    label: "GLM 4 Flash",
+    hint: "Fast",
+    description: "Cheap and fast everyday model.",
+    capabilities: { intelligence: 3, speed: 5, cost: 5 },
+    tags: ["tools"],
+  },
+
+  // ── Moonshot AI ────────────────────────────────────────────────────────────
+  {
+    id: "kimi-k2.6",
+    provider: "moonshot",
+    label: "Kimi K2.6",
+    hint: "Flagship",
+    description: "Moonshot AI flagship multimodal and reasoning model.",
+    capabilities: { intelligence: 5, speed: 3, cost: 3 },
+    tags: ["vision", "reasoning", "tools", "coding"],
+  },
+  {
+    id: "kimi-k2.5",
+    provider: "moonshot",
+    label: "Kimi K2.5",
+    hint: "Balanced",
+    description: "Balanced Mixture-of-Experts model.",
+    capabilities: { intelligence: 4, speed: 4, cost: 4 },
+    tags: ["tools", "coding"],
+  },
+  {
+    id: "moonshot-v1-8k",
+    provider: "moonshot",
+    label: "Moonshot v1 8k",
+    hint: "Chat",
+    description: "Standard conversational model.",
+    capabilities: { intelligence: 3, speed: 4, cost: 5 },
+    tags: ["tools"],
   },
 
 

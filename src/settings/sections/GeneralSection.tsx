@@ -124,10 +124,10 @@ export function GeneralSection() {
               type="button"
               onClick={() => setMode(o.id)}
               className={cn(
-                "group flex h-20 flex-col items-center justify-center gap-1.5 rounded-lg border bg-card transition-all",
+                "group flex h-20 flex-col items-center justify-center gap-1.5 rounded-2xl border bg-card/25 backdrop-blur-md transition-all",
                 mode === o.id
                   ? "border-foreground/60 ring-1 ring-foreground/20"
-                  : "border-border/60 hover:border-border",
+                  : "border-border/40 hover:border-border/80",
               )}
             >
               <HugeiconsIcon icon={o.icon} strokeWidth={1.75}  size={18} />
@@ -143,7 +143,7 @@ export function GeneralSection() {
 
       <div className="flex flex-col gap-2">
         <Label>Zoom</Label>
-        <div className="flex flex-col gap-3 rounded-lg border border-border/60 p-3">
+        <div className="flex flex-col gap-3 rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md p-3">
           <div className="flex items-center justify-between gap-3">
             <span className="text-[11.5px] text-muted-foreground">
               UI zoom level
@@ -330,7 +330,7 @@ export function GeneralSection() {
           />
         </SettingRow>
         {agentSoundEnabled && (
-          <div className="flex flex-col gap-3 rounded-lg border border-border/60 bg-card/60 p-3">
+          <div className="flex flex-col gap-3 rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md p-3">
             <div className="flex items-center justify-between gap-3">
               <span className="text-[12.5px] font-medium">Sound volume</span>
               <span className="tabular-nums text-[11px] text-muted-foreground">

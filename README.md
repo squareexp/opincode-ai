@@ -126,6 +126,23 @@ bun x tsc --noEmit          # frontend type-check
 cd src-tauri && cargo clippy    # Rust lint
 ```
 
+## Changelog
+
+For full release notes, see the [.github/release-notes](.github/release-notes/) directory.
+
+### v0.0.5
+
+This release introduces major inline-pill input editor updates, recursive folder and directory parsing, new Z.AI and Moonshot AI providers, settings cards UI polish, subagent spawn representation styling, and editor syntax additions:
+- **Inline Pill Input Editor**: Replaced the plain input text area with a contenteditable-based rich input editor. Files, folders, snippets, commands, and skills are rendered as interactive inline pills. Fixed caret focus snapping bugs and backspace delete synchronization.
+- **Trigger Characters**: Autocomplete picker now supports slash (/) and dollar ($) characters to trigger and execute skills.
+- **Recursive Folder Attachments**: Attaching folders to the composer now recursively reads the actual text content of files instead of just listing their paths. Dir-based skills also parse all files in their directories.
+- **User Prompt Visibility**: Preserved the user prompt message in the chat bubble by moving it outside the skill XML block. Skill chips are rendered inline in blue without border containers, using dynamic script (sparkles) or dir (opin leaf) icons.
+- **Clean Session Renaming**: Fixed raw XML tags leaking into sidebar session titles by filtering out XML blocks (skills, folders, snippets, selections) in the title derivation algorithm.
+- **Z.AI and Moonshot AI Providers**: Added native integration and models (glm-5.1, glm-5, glm-4-flash, kimi-k2.6, kimi-k2.5, moonshot-v1-8k) for Z.AI and Moonshot AI providers.
+- **Settings UI & card aesthetics**: Updated Settings cards to use rounded-2xl glassmorphic borders and backgrounds. Auto-scrolls, flashes, and focuses the respective provider key fields when clicked.
+- **Subagent spawn representations**: Spawned subagents display as monochromatic cards with dynamic agent icons (Opin, Rob, Supricon, Monkin, Diom), custom colors, and descriptive task summaries.
+- **Editor Additions**: Added swift legacy-mode loader for Swift highlighting/formatting and mapped MDX extension to markdown language parser.
+
 ## Tech stack
 
 Tauri 2, Rust, `portable-pty`, React 19, TypeScript, xterm.js, CodeMirror 6, Vercel AI SDK v6, Tailwind v4, shadcn/ui, Zustand.

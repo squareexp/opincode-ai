@@ -6,17 +6,19 @@ import {
   useRef,
   useState,
 } from "react";
-import { useWhisperRecording } from "../hooks/useWhisperRecording";
-import { expandSnippetTokens, type Snippet } from "../lib/snippets";
-import { tryRunSlashCommand, type SlashCommandMeta } from "./slashCommands";
-import { getOrCreateChat, useChatStore } from "../store/chatStore";
-import { useSnippetsStore } from "../store/snippetsStore";
+import { useWhisperRecording } from "@/modules/ai/hooks/useWhisperRecording";
+import { expandSnippetTokens, type Snippet } from "@/modules/ai/lib/snippets";
+import { tryRunSlashCommand, type SlashCommandMeta } from "@/modules/ai/lib/slashCommands";
+import { findSkill, runSkill, type ResolvedSkill } from "@/modules/ai/lib/skills";
+import { toast } from "sonner";
+import { getOrCreateChat, useChatStore } from "@/modules/ai/store/chatStore";
+import { useSnippetsStore } from "@/modules/ai/store/snippetsStore";
 import { currentWorkspaceEnv } from "@/modules/workspace";
 
 export type FileAttachment = {
   id: string;
   name: string;
-  kind: "image" | "text" | "selection";
+  kind: "image" | "text" | "selection" | "folder";
   mediaType: string;
   url?: string;
   text?: string;
@@ -36,7 +38,7 @@ export const ACCEPTED_FILES =
 type Voice = ReturnType<typeof useWhisperRecording>;
 
 type ComposerCtx = {
-  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
+  editorRef: React.RefObject<HTMLDivElement | null>;
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
   files: FileAttachment[];
@@ -50,6 +52,9 @@ type ComposerCtx = {
   pickedCommands: SlashCommandMeta[];
   addCommand: (c: SlashCommandMeta) => void;
   removeCommand: (name: string) => void;
+  pickedSkills: ResolvedSkill[];
+  addSkill: (s: ResolvedSkill) => void;
+  removeSkill: (name: string) => void;
   isBusy: boolean;
   submit: () => void;
   stop: () => void;
@@ -79,7 +84,8 @@ export function AiComposerProvider({ children }: ProviderProps) {
   const [files, setFiles] = useState<FileAttachment[]>([]);
   const [pickedSnippets, setPickedSnippets] = useState<Snippet[]>([]);
   const [pickedCommands, setPickedCommands] = useState<SlashCommandMeta[]>([]);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [pickedSkills, setPickedSkills] = useState<ResolvedSkill[]>([]);
+  const editorRef = useRef<HTMLDivElement>(null);
 
   const focusSignal = useChatStore((s) => s.focusSignal);
   const pendingPrefill = useChatStore((s) => s.pendingPrefill);
@@ -89,7 +95,7 @@ export function AiComposerProvider({ children }: ProviderProps) {
 
   useEffect(() => {
     if (focusSignal === 0) return;
-    textareaRef.current?.focus();
+    editorRef.current?.focus();
     if (pendingPrefill != null) {
       const text = consumePrefill();
       if (text) setValue((v) => (v ? `${text}${v}` : text));
@@ -100,10 +106,10 @@ export function AiComposerProvider({ children }: ProviderProps) {
   const prevIsBusyRef = useRef(false);
   useEffect(() => {
     if (prevIsBusyRef.current && !isBusy) {
-      requestAnimationFrame(() => textareaRef.current?.focus());
+      requestAnimationFrame(() => editorRef.current?.focus());
     }
     prevIsBusyRef.current = isBusy;
-  }, [isBusy, textareaRef]);
+  }, [isBusy, editorRef]);
 
   // Listen for explorer's "Attach to Agent" event.
   useEffect(() => {
@@ -148,7 +154,7 @@ export function AiComposerProvider({ children }: ProviderProps) {
   const voice = useWhisperRecording({
     onResult: (transcript: string) => {
       setValue((v) => (v ? `${v} ${transcript}` : transcript));
-      requestAnimationFrame(() => textareaRef.current?.focus());
+      requestAnimationFrame(() => editorRef.current?.focus());
     },
   });
 
@@ -179,35 +185,98 @@ export function AiComposerProvider({ children }: ProviderProps) {
   const removeCommand = (name: string) =>
     setPickedCommands((prev) => prev.filter((c) => c.name !== name));
 
+  const addSkill = (s: ResolvedSkill) =>
+    setPickedSkills((prev) =>
+      prev.some((p) => p.name === s.name) ? prev : [...prev, s],
+    );
+  const removeSkill = (name: string) =>
+    setPickedSkills((prev) => prev.filter((s) => s.name !== name));
+
   const attachFileByPath = async (path: string) => {
     try {
-      type ReadResult =
-        | { kind: "text"; content: string; size: number }
-        | { kind: "binary"; size: number }
-        | { kind: "toolarge"; size: number; limit: number };
-      const result = await invoke<ReadResult>("fs_read_file", {
-        path,
-        workspace: currentWorkspaceEnv(),
-      });
-      if (result.kind !== "text") {
-        // Binary/oversize files: skip (could surface a toast in future).
-        console.warn("attachFileByPath: skipped non-text file", path, result);
-        return;
+      const isFolder = path.endsWith("/");
+      if (isFolder) {
+        const folderPath = path.slice(0, -1);
+        type ListFilesResult = { files: string[]; truncated: boolean };
+        type ReadResult =
+          | { kind: "text"; content: string; size: number }
+          | { kind: "binary"; size: number }
+          | { kind: "toolarge"; size: number; limit: number };
+        const result = await invoke<ListFilesResult>("fs_list_files", {
+          root: folderPath,
+          workspace: currentWorkspaceEnv(),
+        });
+        // Read actual content of each file in the folder
+        const fileContentBlocks: string[] = [];
+        let totalSize = 0;
+        for (const relPath of result.files) {
+          // Skip directories (they end with "/" in our fs_list_files output)
+          if (relPath.endsWith("/")) continue;
+          const absFilePath = `${folderPath}/${relPath}`;
+          try {
+            const fileResult = await invoke<ReadResult>("fs_read_file", {
+              path: absFilePath,
+              workspace: currentWorkspaceEnv(),
+            });
+            if (fileResult.kind === "text") {
+              const fileName = relPath.split("/").pop() || relPath;
+              fileContentBlocks.push(
+                `<file name="${fileName}" path="${relPath}">\n${fileResult.content}\n</file>`,
+              );
+              totalSize += fileResult.size;
+            }
+          } catch {
+            // Skip unreadable files silently
+          }
+        }
+        // Fall back to path list if no files could be read
+        const folderText =
+          fileContentBlocks.length > 0
+            ? fileContentBlocks.join("\n\n")
+            : result.files.join("\n");
+        const name = folderPath.split("/").pop() || folderPath;
+        const id = `path-${path}`;
+        setFiles((prev) => {
+          if (prev.some((f) => f.id === id)) return prev;
+          const att: FileAttachment = {
+            id,
+            name,
+            kind: "folder",
+            mediaType: "text/plain",
+            text: folderText,
+            size: totalSize || folderText.length,
+          };
+          return [...prev, att];
+        });
+      } else {
+        type ReadResult =
+          | { kind: "text"; content: string; size: number }
+          | { kind: "binary"; size: number }
+          | { kind: "toolarge"; size: number; limit: number };
+        const result = await invoke<ReadResult>("fs_read_file", {
+          path,
+          workspace: currentWorkspaceEnv(),
+        });
+        if (result.kind !== "text") {
+          // Binary/oversize files: skip (could surface a toast in future).
+          console.warn("attachFileByPath: skipped non-text file", path, result);
+          return;
+        }
+        const name = path.split("/").pop() || path;
+        const id = `path-${path}`;
+        setFiles((prev) => {
+          if (prev.some((f) => f.id === id)) return prev;
+          const att: FileAttachment = {
+            id,
+            name,
+            kind: "text",
+            mediaType: "text/plain",
+            text: result.content,
+            size: result.size,
+          };
+          return [...prev, att];
+        });
       }
-      const name = path.split("/").pop() || path;
-      const id = `path-${path}`;
-      setFiles((prev) => {
-        if (prev.some((f) => f.id === id)) return prev;
-        const att: FileAttachment = {
-          id,
-          name,
-          kind: "text",
-          mediaType: "text/plain",
-          text: result.content,
-          size: result.size,
-        };
-        return [...prev, att];
-      });
       // Open the AI panel & focus the input so the user sees the chip.
       useChatStore.getState().focusInput();
     } catch (e) {
@@ -215,14 +284,15 @@ export function AiComposerProvider({ children }: ProviderProps) {
     }
   };
 
-  const submit = () => {
+  const submit = async () => {
     if (isBusy) return;
     const trimmed = value.trim();
     if (
       !trimmed &&
       files.length === 0 &&
       pickedSnippets.length === 0 &&
-      pickedCommands.length === 0
+      pickedCommands.length === 0 &&
+      pickedSkills.length === 0
     )
       return;
 
@@ -231,6 +301,56 @@ export function AiComposerProvider({ children }: ProviderProps) {
     let effectiveText = trimmed;
     let commandMarker: string | null = null;
     let commandSource = trimmed;
+
+    // Check for picked skill command (pills)
+    if (pickedSkills.length > 0) {
+      const workspaceRoot = useChatStore.getState().live.getWorkspaceRoot();
+      const skill = pickedSkills[0];
+      try {
+        let remainingText = trimmed;
+        const skillNameLower = skill.name.toLowerCase();
+        if (trimmed.toLowerCase().startsWith(skillNameLower)) {
+          remainingText = trimmed.slice(skill.name.length).trim();
+        }
+        const skillBody = await runSkill(skill, remainingText, workspaceRoot);
+        const isScript = ["sh", "bash", "zsh", "py", "js"].includes((skill.ext ?? "").toLowerCase());
+        // Wrap in a skill block so the message display strips it and shows a pill,
+        // and append the user's actual prompt text so it displays in the chat.
+        effectiveText = `<skill name="${skill.name}" isScript="${isScript}">\n${skillBody}\n</skill>${remainingText ? `\n\n${remainingText}` : ""}`;
+        commandSource = effectiveText;
+      } catch (err: any) {
+        toast.error(`Failed to run skill $${skill.name}: ${err?.message || err}`);
+        return;
+      }
+    } else if (trimmed.startsWith("$") || trimmed.startsWith("/")) {
+      // Check for typed skill command trigger ($prefix or /prefix)
+      const match = trimmed.match(/^[\$/]([a-zA-Z][a-zA-Z0-9_-]*)(?:\s+([\s\S]*))?$/);
+      if (match) {
+        const skillName = match[1];
+        const remainingText = match[2] ? match[2].trim() : "";
+        const workspaceRoot = useChatStore.getState().live.getWorkspaceRoot();
+        const isSlashCmd = trimmed.startsWith("/") && ["plan", "init", "claude-code"].includes(skillName.toLowerCase());
+        if (!isSlashCmd) {
+          try {
+            const skill = await findSkill(skillName, workspaceRoot);
+            if (skill) {
+              const skillBody = await runSkill(skill, remainingText, workspaceRoot);
+              const isScript = ["sh", "bash", "zsh", "py", "js"].includes((skill.ext ?? "").toLowerCase());
+              // Wrap in a skill block so the message display strips it and shows a pill,
+              // and append the user's actual prompt text so it displays in the chat.
+              effectiveText = `<skill name="${skill.name}" isScript="${isScript}">\n${skillBody}\n</skill>${remainingText ? `\n\n${remainingText}` : ""}`;
+              commandSource = effectiveText;
+            } else if (trimmed.startsWith("$")) {
+              toast.error(`Skill not found: $${skillName}`);
+              return;
+            }
+          } catch (err: any) {
+            toast.error(`Failed to run skill $${skillName}: ${err?.message || err}`);
+            return;
+          }
+        }
+      }
+    }
     if (pickedCommands.length > 0 && !trimmed.startsWith("/") && !trimmed.startsWith("#")) {
       commandSource = `#${pickedCommands[0].name} ${trimmed}`.trim();
     }
@@ -256,14 +376,31 @@ export function AiComposerProvider({ children }: ProviderProps) {
         (f) =>
           `<file name="${f.name}" mediaType="${f.mediaType}">\n${f.text ?? ""}\n</file>`,
       );
+    const folderBlocks = files
+      .filter((f) => f.kind === "folder")
+      .map(
+        (f) =>
+          `<folder name="${f.name}">\n${f.text ?? ""}\n</folder>`,
+      );
     const selectionBlocks = files
       .filter((f) => f.kind === "selection")
       .map(
         (f) =>
           `<selection source="${f.source ?? "terminal"}">\n${f.text ?? ""}\n</selection>`,
       );
+    // Extract skill blocks from effectiveText so they compose correctly
+    const skillBlocksFromText: string[] = [];
+    let textWithoutSkillBlocks = effectiveText;
+    const SKILL_BLOCK_RE = /<skill\s+name="([^"]+)">\n?[\s\S]*?\n?<\/skill>/g;
+    if (SKILL_BLOCK_RE.test(effectiveText)) {
+      SKILL_BLOCK_RE.lastIndex = 0;
+      textWithoutSkillBlocks = effectiveText.replace(SKILL_BLOCK_RE, (match) => {
+        skillBlocksFromText.push(match);
+        return "";
+      }).trim();
+    }
     const { body: bodyAfterTokens, blocks: snippetBlocks } = expandSnippetTokens(
-      effectiveText,
+      textWithoutSkillBlocks,
       useSnippetsStore.getState().snippets,
     );
     const seenHandles = new Set<string>();
@@ -283,8 +420,10 @@ export function AiComposerProvider({ children }: ProviderProps) {
     }
     const composed = [
       commandMarker ?? "",
+      skillBlocksFromText.join("\n\n"),
       allSnippetBlocks.join("\n\n"),
       selectionBlocks.join("\n\n"),
+      folderBlocks.join("\n\n"),
       fileBlocks.join("\n\n"),
       bodyAfterTokens,
     ]
@@ -315,8 +454,9 @@ export function AiComposerProvider({ children }: ProviderProps) {
     setFiles([]);
     setPickedSnippets([]);
     setPickedCommands([]);
+    setPickedSkills([]);
     // Re-focus immediately after submit so the user can type a follow-up
-    requestAnimationFrame(() => textareaRef.current?.focus());
+    requestAnimationFrame(() => editorRef.current?.focus());
   };
 
   const stop = () => {
@@ -329,10 +469,11 @@ export function AiComposerProvider({ children }: ProviderProps) {
     (value.trim().length > 0 ||
       files.length > 0 ||
       pickedSnippets.length > 0 ||
-      pickedCommands.length > 0);
+      pickedCommands.length > 0 ||
+      pickedSkills.length > 0);
 
   const ctx: ComposerCtx = {
-    textareaRef,
+    editorRef,
     value,
     setValue,
     files,
@@ -345,6 +486,9 @@ export function AiComposerProvider({ children }: ProviderProps) {
     pickedCommands,
     addCommand,
     removeCommand,
+    pickedSkills,
+    addSkill,
+    removeSkill,
     isBusy,
     submit,
     stop,

@@ -1,12 +1,11 @@
 import { LazyStore } from "@tauri-apps/plugin-store";
 
 export type AgentIconId =
-  | "coder"
-  | "architect"
-  | "reviewer"
-  | "security"
-  | "designer"
-  | "spark";
+  | "opin"
+  | "monkin"
+  | "rob"
+  | "supricon"
+  | "diom";
 
 export type Agent = {
   id: string;
@@ -20,11 +19,12 @@ export type Agent = {
 export const BUILTIN_AGENTS: readonly Agent[] = [
   {
     id: "builtin:coder",
-    name: "Coder",
+    name: "Opin",
     description: "General-purpose coding assistant. Writes, edits, and runs.",
-    icon: "coder",
+    icon: "opin",
     builtIn: true,
     instructions: `You are an expert software engineer pair-programming inside the user's terminal.
+- Delegate read-only codebase exploration, files search, and audits to subagents using the \`run_subagent\` tool to keep your context clean.
 - Read files before editing them. Match existing patterns and naming.
 - Prefer the smallest correct change. Don't refactor adjacent code unprompted.
 - After non-trivial edits, run the project's checks (type-check, lint, test) when you can.
@@ -32,11 +32,12 @@ export const BUILTIN_AGENTS: readonly Agent[] = [
   },
   {
     id: "builtin:architect",
-    name: "Architect",
+    name: "Monkin",
     description: "Design and tradeoffs. Plans before code.",
-    icon: "architect",
+    icon: "monkin",
     builtIn: true,
     instructions: `You are a senior software architect.
+- Delegate deep codebase reading, search, and validation tasks to subagents using the \`run_subagent\` tool to keep your context clean.
 - Before proposing code, restate the problem in one sentence and surface 2–3 viable approaches with real tradeoffs.
 - Recommend one with reasoning. Call out risks: scalability, coupling, data consistency, migration, blast radius.
 - Reference the actual repo (read key files) before generalizing. No hand-wavy advice.
@@ -44,11 +45,12 @@ export const BUILTIN_AGENTS: readonly Agent[] = [
   },
   {
     id: "builtin:reviewer",
-    name: "Code Reviewer",
+    name: "Rob",
     description: "Reviews diffs for correctness, perf, security.",
-    icon: "reviewer",
+    icon: "rob",
     builtIn: true,
     instructions: `You are a meticulous code reviewer.
+- Delegate checking file contents or running audits to subagents using the \`run_subagent\` tool.
 - Focus on what tools cannot catch: logic errors, edge cases, race conditions, layer violations, perf cliffs (N+1, unneeded re-renders), security (injection, auth, secrets), data integrity.
 - Skip formatting / naming / inferred-type nits — linters handle those.
 - Output: \`[MUST/SHOULD/NIT] file:line — issue → fix\`. If nothing real, say "Looks good."
@@ -56,11 +58,12 @@ export const BUILTIN_AGENTS: readonly Agent[] = [
   },
   {
     id: "builtin:security",
-    name: "Security",
+    name: "Supricon",
     description: "Threat-models changes and flags vulns.",
-    icon: "security",
+    icon: "supricon",
     builtIn: true,
     instructions: `You are an application-security engineer.
+- Delegate scanning specific files or directory structures to subagents using the \`run_subagent\` tool.
 - Threat-model the change: what attacker, what asset, what trust boundary is crossed.
 - Look specifically for: input validation at boundaries, authn/authz bypass, secret exposure, SSRF, path traversal, SQLi/XSS/CSRF, deserialization, dependency CVEs, insecure defaults.
 - For each finding: severity, exploit sketch, concrete fix. Prefer fixes that close the class of bug, not the one report.
@@ -68,9 +71,9 @@ export const BUILTIN_AGENTS: readonly Agent[] = [
   },
   {
     id: "builtin:designer",
-    name: "Designer",
+    name: "Diom",
     description: "UI/UX critique and refinement.",
-    icon: "designer",
+    icon: "diom",
     builtIn: true,
     instructions: `You are a senior product designer with a strong taste for restrained, modern UI.
 - Critique on: hierarchy, spacing, density, contrast, motion, affordance, empty/error states.

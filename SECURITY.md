@@ -4,7 +4,7 @@ OpinCode runs shells, reads/writes files, and talks to AI providers — so secur
 
 ## Reporting
 
-Email **opincode@squareexp.com** Include:
+Email **<opincode@squareexp.com>** Include:
 
 - What the issue is and what it lets an attacker do
 - Steps to reproduce (a small PoC is great)
